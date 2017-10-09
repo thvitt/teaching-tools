@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from itertools import chain
 
 from bs4 import BeautifulSoup
@@ -69,6 +70,15 @@ def calendar_urls(url):
     soup = BeautifulSoup(session.get(url).text, 'lxml')
     links = soup.select('a[href]')
     return [a.get('href') for a in links if 'iCalendar' in a.get('href')]
+
+def fix_ics_linebreaks(ics_text):
+    lines = []
+    for line in re.split('\r?\n', ics_text):
+        if ":" in line:
+            lines.append(line)
+        else:
+            lines[-1] += line
+    return "\n".join(lines)
 
 
 def get_events(ics_url: str):
