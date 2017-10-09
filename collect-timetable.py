@@ -89,7 +89,7 @@ def get_events(ics_url: str):
     """
     response = session.get(ics_url)
     try:
-        components = vobject.readComponents(response.text, ignoreUnreadable=True)
+        components = vobject.readComponents(fix_ics_linebreaks(response.text), ignoreUnreadable=True)
         for component in components:
             for child in component.getChildren():
                 if child.name == 'VEVENT':
