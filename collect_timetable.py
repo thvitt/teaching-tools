@@ -4,8 +4,8 @@ from itertools import chain
 
 from bs4 import BeautifulSoup
 from requests import Session
-import vobject
 import argparse
+from icalendar import Calendar
 
 from vobject.base import VObjectError
 
@@ -89,22 +89,21 @@ def get_events(ics_url: str):
     """
     response = session.get(ics_url)
     try:
-        components = vobject.readComponents(fix_ics_linebreaks(response.text), ignoreUnreadable=True)
-        for component in components:
-            for child in component.getChildren():
-                if child.name == 'VEVENT':
-                    yield child
+        cal = Calendar.from_ical(fix_ics_linebreaks(response.text))
+        for component in cal.subcomponents:
+            if component.name == 'VEVENT':
+                yield component
     except VObjectError as e:
         print("ERROR parsing", ics_url, ": ", e)
 
 
-def collect_calendar(root_url: str) -> vobject.icalendar.VCalendar2_0:
+def collect_calendar(root_url: str) -> Calendar:
     """
     Collects all evens from the
     :param root_url:
     :return:
     """
-    cal = vobject.iCalendar()
+    cal = Calendar()
     lecture_pages = remove_duplicates(collect_lecture_links(root_url))
     ics_urls = chain.from_iterable(calendar_urls(lec) for lec in lecture_pages)
     events = chain.from_iterable(get_events(url) for url in ics_urls)
@@ -118,10 +117,10 @@ def getargparser() -> argparse.ArgumentParser:
         verlinkten Events heraus und speichert sie in einer iCalendar-Datei.
     """)
     parser.add_argument("url", help="SB@Home-Ausgangs-URL")
-    parser.add_argument("output", type=argparse.FileType("wt", encoding="UTF-8"), help=".ics-Datei")
+    parser.add_argument("output", type=argparse.FileType("wb"), help=".ics-Datei")
     return parser
 
 if __name__ == '__main__':
     options = getargparser().parse_args()
     cal = collect_calendar(options.url)
-    cal.serialize(options.output)
+    options.output.write(cal.to_ical())
