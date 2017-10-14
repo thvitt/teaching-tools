@@ -6,6 +6,10 @@ import sys
 from collections import defaultdict
 from itertools import count
 from functools import partial
+import logging
+
+logger = logging.Logger(__name__)
+
 
 def name_map(fmt="v{}", start=0):
     """
@@ -28,7 +32,6 @@ def name_map(fmt="v{}", start=0):
 
 
 class Renamer(ast.NodeVisitor):
-
     def __init__(self):
         self.new_names = name_map()
 
@@ -40,13 +43,24 @@ class Renamer(ast.NodeVisitor):
         node.name = self.new_names[node.name]
         self.generic_visit(node)
 
-def load_unified_source(filename):
-    code = astor.code_to_ast.parse_file(filename)
-    Renamer().visit(code)
-    return astor.to_source(code)
+
+def load_unified_source(filename: str, copy_unparseable: bool = False) -> str:
+    try:
+        code = astor.code_to_ast.parse_file(filename)
+        Renamer().visit(code)
+        return astor.to_source(code)
+    except:
+        logger.error("Failed to parse {}".format(filename), exc_info=True)
+        if copy_unparseable:
+            with open(filename, "rt") as source:
+                return source.read()
+        else:
+            raise
+
 
 def _main():
     print(load_unified_source(sys.argv[1]))
+
 
 if __name__ == '__main__':
     _main()
