@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 
 import smtplib
+import codecs
+import email
+from email.message import EmailMessage
 from email.parser import Parser
 from email.utils import getaddresses
+from email import policy
 from getpass import getpass
 from csv import DictReader
 import pymustache
 import argparse
+
+import sys
+
+from io import BytesIO
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                  description="Simple Mass-Mailer")
@@ -31,19 +39,27 @@ options = parser.parse_args()
 template = options.template.read()
 reader = DictReader(options.csv)
 
+
 server = smtplib.SMTP_SSL(options.smtp_server)
-server.login(options.smtp_user, getpass())
+
+if not options.dry_run:
+    server.login(options.smtp_user, getpass())
 
 for row in reader:
     formatted = pymustache.render(template, row)
-    msg = Parser().parsestr(formatted) # -> message.Message
-    recipients = msg.get_all('to', []) + msg.get_all('cc', [])
-    addr = getaddresses(recipients)
+    header, body = formatted.split('\n\n', maxsplit=1)
+    msg = Parser(policy=policy.EmailPolicy(utf8=True)).parsestr(header, headersonly=True)
+    if options.html:
+        msg.set_content(body, subtype='html', charset='utf-8')
+    else:
+        msg.set_content(body, charset='utf-8')
+
+    recipients = msg.get_all('to', []) + msg.get_all('cc', []) + msg.get_all('bcc', [])
+    addr = getaddresses([r for r in recipients if r])
     print("Sende an:", addr)
 
-    if options.html:
-        msg.set_type('text/html')
-        msg.set_charset('utf-8')
 
     if not options.dry_run:
         server.send_message(msg)
+    else:
+        print(msg)
