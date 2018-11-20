@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+from operator import attrgetter
 from tempfile import mkstemp
 from subprocess import run
 from blessings import Terminal
@@ -44,6 +44,10 @@ class Bewertung:
     @property
     def text(self):
         return "".join(self.lines)
+
+    @property
+    def lastname(self):
+        return self.name.split()[-1]
 
     def mktemp(self):
         if self.filename:
@@ -105,7 +109,7 @@ def prepare_input_file(filename):
 def main(argv):
     infile = argv[1] if len(argv) > 1 else "Bewertung.md"
     try:
-        bewertungen = read(infile)
+        bewertungen = sorted(read(infile), key=attrgetter('lastname'))
     except FileNotFoundError:
         prepare_input_file(infile)
 
