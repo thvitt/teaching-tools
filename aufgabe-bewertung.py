@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from operator import attrgetter
+from pathlib import Path
 from tempfile import mkstemp
 from subprocess import run
 from blessings import Terminal
@@ -62,6 +63,10 @@ class Bewertung:
         run("pandoc -t html -f markdown -i '{}' | xclip -i -selection clipboard -t text/html"
             .format(self.filename), shell=True)
 
+    def to_html(self):
+        pandoc = run(["pandoc", "-t", "html", "-f", "markdown"], input=self.text, text=True, capture_output=True)
+        return pandoc.stdout
+
     def close(self):
         if self.filename is not None:
             os.remove(self.filename)
@@ -107,20 +112,14 @@ def prepare_input_file(filename):
 
 
 def main(argv):
-    infile = argv[1] if len(argv) > 1 else "Bewertung.md"
+    infile = Path(argv[1] if len(argv) > 1 else "Bewertung.md")
     try:
         bewertungen = sorted(read(infile), key=attrgetter('lastname'))
     except FileNotFoundError:
         prepare_input_file(infile)
 
-    index = 0
 
-    basename, _ = os.path.splitext(infile)
-    with open(basename + ".csv", "wt", encoding="utf-8") as csvout:
-        writer = csv.writer(csvout)
-        writer.writerow(["Name", "Bewertung"])
-        for bewertung in bewertungen:
-            writer.writerow([bewertung.name, bewertung.grade])
+    export_simple_csv(bewertungen, infile.with_suffix('.csv'))
 
     try:
         grades = [float(bewertung.grade) for bewertung in bewertungen]
@@ -128,6 +127,11 @@ def main(argv):
     except ValueError:
         pass # b/nb -> kein Durchschnitt
 
+    display_bewertungen(bewertungen)
+
+
+def display_bewertungen(bewertungen):
+    index = 0
     while 0 <= index < len(bewertungen):
         bewertung = bewertungen[index]
         try:
@@ -137,9 +141,9 @@ def main(argv):
 
             prompt = True
             while prompt:
-                print(t.green("#{}/{}:".format(index+1, len(bewertungen))),
-                    "{} ({})".format(bewertung.name, bewertung.grade),
-                    "↑ {t.bold}p{t.normal}revious, ↓⏎ {t.bold}n{t.normal}ext, {t.bold}c{t.normal}opy again, {t.bold}q{t.normal}uit"
+                print(t.green("#{}/{}:".format(index + 1, len(bewertungen))),
+                      "{} ({})".format(bewertung.name, bewertung.grade),
+                      "↑ {t.bold}p{t.normal}revious, ↓⏎ {t.bold}n{t.normal}ext, {t.bold}c{t.normal}opy again, {t.bold}q{t.normal}uit"
                       .format(t=t), end=' > ', flush=True)
                 ch = readkey()
                 if ch in ["p", "P", key.UP, key.BACKSPACE]:
@@ -160,6 +164,13 @@ def main(argv):
         finally:
             bewertung.close()
 
+
+def export_simple_csv(bewertungen, outfile):
+    with open(outfile, "wt", encoding="utf-8") as csvout:
+        writer = csv.writer(csvout)
+        writer.writerow(["Name", "Bewertung"])
+        for bewertung in bewertungen:
+            writer.writerow([bewertung.name, bewertung.grade])
 
 
 if __name__ == '__main__':
