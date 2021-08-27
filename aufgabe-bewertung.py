@@ -144,7 +144,7 @@ def prepare_input_file(filename, moodle_csv=None):
 def main():
     options = getargparser().parse_args()
     if options.markdown_file.exists():
-        bewertungen = sorted(read(options.markdown_file), key=attrgetter('lastname'))
+        bewertungen = sorted(read(options.markdown_file), key=attrgetter('name'))
     else:
         prepare_input_file(options.markdown_file, options.moodle_csv)
         return
