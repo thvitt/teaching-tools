@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 from operator import attrgetter
 from pathlib import Path
 from tempfile import mkstemp
