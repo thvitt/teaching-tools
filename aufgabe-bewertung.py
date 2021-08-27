@@ -31,11 +31,13 @@ NAME = re.compile('^## ([^_\n]+)(_.*)?')
 
 class Bewertung:
 
-    def __init__(self, head, lines=None):
-        self.head = head
+    def __init__(self, name, lines=None, common_note=None):
+        self.name = name
         self.lines = [] if lines is None else lines
         self.filename = None
-        self.name = NAME.match(head).group(1)
+        if common_note and isinstance(common_note, str):
+            common_note = [common_note]
+        self.common_note = common_note
 
     def append(self, *args):
         self.lines.extend(args)
@@ -57,7 +59,10 @@ class Bewertung:
 
     @property
     def text(self):
-        return "".join(self.lines)
+        lines = self.lines
+        if self.common_note:
+            lines += ['', '----', ''] + self.common_note
+        return '\n'.join(lines)
 
     @property
     def lastname(self):
@@ -86,8 +91,8 @@ class Bewertung:
             self.filename = None
 
     def __str__(self):
-        return (self.head
-                + "=" * len(self.head)
+        return (self.name
+                + "=" * len(self.name)
                 + "\n\n"
                 + "".join(self.lines)
                 + "\n\n")
@@ -104,15 +109,16 @@ def read(filename):
         Liste von :class:`Bewertung`en
     """
     bewertungen = []
-    with open(filename) as file:
-        bewertung = None
-        for line in file:
-            if NAME.match(line):
-                if bewertung: bewertungen.append(bewertung)
-                bewertung = Bewertung(line)
-            else:
-                if bewertung: bewertung.append(line)
-        bewertungen.append(bewertung)
+    text = '\n' + Path(filename).read_text()
+    parts = text.split('\n## ')
+    preamble = parts[0].strip()
+    
+    for section in parts[1:]:
+        lines = section.strip().split('\n')
+        names = lines[0].split('; ')
+        for name in names:
+            bewertungen.append(Bewertung(name, lines[1:], common_note=preamble))
+    
     return bewertungen
 
 
