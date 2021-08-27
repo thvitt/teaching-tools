@@ -222,6 +222,8 @@ def augment_moodle_csv(bewertungen: List[Bewertung], moodle_csv: Path, output: P
             if name in by_name:
                 line[GRADE_FIELD] = by_name[name].grade
                 line[COMMENT_FIELD] = by_name[name].to_html()
+                line['Status'] = 'Freigegeben (Teilnehmer können ihre Bewertung einsehen)'
+                line['Bewerter/in'] = 'Thorsten Vitt'
                 found.add(name)
             else:
                 not_found.add(name)
