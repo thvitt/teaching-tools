@@ -64,6 +64,13 @@ def write_headings(groups, output):
     for group in groups:
         output.write('## ' + "; ".join(group) + '\n\n')
 
+def list_collabs(groups):
+    collabs = [group for group in groups if len(group) > 1]
+    print(f'{len(collabs)} out of {len(groups)} solutions might be collaborations:')
+    for group in collabs:
+        print('-', ', '.join(group))
+
+
 if __name__ == '__main__':
     options = getargparser().parse_args()
     contents = load(glob(options.pattern))
@@ -73,6 +80,7 @@ if __name__ == '__main__':
         dendrogram(clustering, contents.index, options.dendrogram, options.threshold)
     if options.headings:
         write_headings(groups, options.headings)
+    list_collabs(groups)
 
 
 
