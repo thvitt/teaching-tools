@@ -7,7 +7,10 @@ from typing import List, Dict
 
 from blessings import Terminal
 from more_itertools import one
-from readchar import key, readkey
+try:
+    from readchar import key, readkey
+except ImportError as e:
+    print("Failed to import readkey module. Interactions will fail.", e)
 import os
 import sys
 import re
