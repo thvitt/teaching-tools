@@ -4,6 +4,7 @@ This repository contains a few scripts that I use primarily to support teaching 
 
 This is mostly hacky and probably not suited for anybody except me. 
 
+
 ### aufgabe-bewertung.py
 
 When giving students feedback for programming tasks etc., I usually write a single markdown file with my comments and the grade. This script can create a template and it can fill in comments (converted from Markdown to HTML using pandoc) and grades into a CSV file exported from Moodle, so I just need to import the CSV file instead of dealing with Moodle’s web interface.
