@@ -28,7 +28,7 @@ def ls(path: Path):
             title = re.sub(r'[-_]+', ' ', path.stem)
         print(f'* [{title}]({path.with_suffix(".pdf")!s})')
 
-def _main(args=sys.argv):
+def main(args=sys.argv):
     if len(args) > 1:
         for arg in args[1:]:
             ls(Path(arg))
@@ -36,4 +36,4 @@ def _main(args=sys.argv):
         ls(Path())
 
 if __name__ == '__main__':
-    _main()
+    main()

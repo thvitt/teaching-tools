@@ -58,9 +58,9 @@ def load_unified_source(filename: str, copy_unparseable: bool = False) -> str:
             raise
 
 
-def _main():
+def main():
     print(load_unified_source(sys.argv[1]))
 
 
 if __name__ == '__main__':
-    _main()
+    main()

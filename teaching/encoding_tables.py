@@ -736,7 +736,7 @@ def prepare_svg(codepoints: List[int], chars: List[str]):
     return svg
 
 
-def _main():
+def main():
     options = getargparser().parse_args()
     codepoints = list(range(options.start, options.start + 128))
     chars = list(get_chars(codepoints=codepoints, encoding=options.encoding))
@@ -748,4 +748,4 @@ def _main():
 
 
 if __name__ == '__main__':
-    _main()
+    main()

@@ -156,7 +156,7 @@ class GradeTable:
             self.results[title] = pd.Series(final_grades)
 
 
-def _main():
+def main():
     options = _getargparser().parse_args()
     if options.grader:
         Grader = GRADER_CLASSES[options.grader]
@@ -178,4 +178,4 @@ def _main():
     print(table)
     
 if __name__  == '__main__':
-    _main()
+    main()
