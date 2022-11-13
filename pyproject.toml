@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "teaching-tools"
+version = "0.1.0"
+description = "Thorstens Teaching Tools"
+authors = ["Thorsten Vitt <thorsten.vitt@uni-wuerzburg.de>"]
+packages = [{include = "teaching" }]
+
+[tool.poetry.scripts]
+aufgabe-bewertung = "teaching.aufgabe_bewertung:main"
+aushang = "teaching.aushang:main"
+bewertung-merge = "teaching.bewertung_merge:main"
+diffencoding = "teaching.diffencoding:report_diff"
+encoding-tables = "teaching.encoding_tables:main"
+fontdifftable = "teaching.fontdifftable:main"
+kdenlive-guide-table = "teaching.kdenlive_guide_table:main"
+ls-md = "teaching.ls_md:main"
+mailmerge = "teaching.mailmerge:main"
+mltmove = "teaching.mltmove:move_resources"
+similar-solutions = "teaching.similar_solutions:main"
+un2up = "teaching.un2up:main"
+unify-source = "teaching.unify_source:main"
+video-thumbnail = "teaching.video_thumbnail:extract_thumbnail"
+xfiles-graph = "teaching.xfiles_graph:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+blessings = "^1.7"
+more-itertools = "^8.13.0"
+readchar = "^3.0.5"
+matplotlib = "^3.5.2"
+numpy = "^1.23.1"
+pandas = "^1.4.3"
+click = "^8.1.3"
+lxml = "^4.9.1"
+"ruamel.yaml" = "^0.17.21"
+pymustache = "^0.3"
+tabulate = "^0.8.10"
+PyPDF2 = "^2.7.0"
+astor = "^0.8.1"
+networkx = "^2.8.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

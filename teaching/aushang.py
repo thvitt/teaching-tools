@@ -70,7 +70,7 @@ $content
 spacer = '\n\n\\vspace{\\fill}\n\n'
 
 
-def _main():
+def main():
     parser = ArgumentParser()
     parser.add_argument('message', nargs='+')
     parser.add_argument('-o', '--output', type=Path, metavar='PDF', help='save pdf here')
@@ -113,4 +113,4 @@ def _main():
 
 
 if __name__ == '__main__':
-    _main()
+    main()

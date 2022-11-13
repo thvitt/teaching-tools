@@ -4,22 +4,24 @@ This repository contains a few scripts that I use primarily to support teaching 
 
 This is mostly hacky and probably not suited for anybody except me. 
 
+To install, install this package using pip or poetry. Each script is a module in the package 'teaching' and a script that is installed to …/bin.
 
-### aufgabe-bewertung.py
+
+### aufgabe-bewertung
 
 When giving students feedback for programming tasks etc., I usually write a single markdown file with my comments and the grade. This script can create a template and it can fill in comments (converted from Markdown to HTML using pandoc) and grades into a CSV file exported from Moodle, so I just need to import the CSV file instead of dealing with Moodle’s web interface.
 
 
-### mailmerge.py
+### mailmerge
 
 Send E-Mails from a mustache template and a CSV file.
 
 
-### similar-solutions.py, unify_source.py
+### similar-solutions, unify_source.py
 
 Parses python files, strips comments and formatting, renames all variables to standardized names and runs a simple similarity measurement on the results, producing similarity scores and a dendrogram. This can be useful to detect the kind of group work where student A copies the solution of student B and renames some variables before manually looking at the files.
 
-### diffencoding.py
+### diffencoding
 
 Shows how two 8-bit encodings differ, in terms of a unicode table.
 

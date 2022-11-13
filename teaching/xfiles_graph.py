@@ -51,5 +51,8 @@ class Analyzer:
         nx.nx_agraph.write_dot(self.g, 'imports.dot')
 
 
-if __name__ == '__main__':
+def main():
     Analyzer(Path(sys.argv[1])).to_dot()
+
+if __name__ == '__main__':
+    main()

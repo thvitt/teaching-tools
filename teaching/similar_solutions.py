@@ -71,7 +71,7 @@ def list_collabs(groups):
         print('-', ', '.join(group))
 
 
-if __name__ == '__main__':
+def main():
     options = getargparser().parse_args()
     contents = load(glob(options.pattern))
     diffs = distance_matrix(contents)
@@ -83,6 +83,8 @@ if __name__ == '__main__':
     list_collabs(groups)
 
 
+if __name__ == '__main__':
+    main()
 
 
 # files = list(Path().glob('*.py'))
