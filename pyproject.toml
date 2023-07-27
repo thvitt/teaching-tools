@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teaching-tools"
-version = "0.2.2"
+version = "0.2.3"
 description = "Thorstens Teaching Tools"
 authors = ["Thorsten Vitt <thorsten.vitt@uni-wuerzburg.de>"]
 packages = [{include = "teaching" }]
@@ -21,6 +21,7 @@ unify-source = "teaching.unify_source:main"
 un2up = "teaching.un2up:main"
 video-thumbnail = "teaching.video_thumbnail:extract_thumbnail"
 xfiles-graph = "teaching.xfiles_graph:main"
+mix-words = "teaching.mix_words:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
