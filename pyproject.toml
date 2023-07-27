@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teaching-tools"
-version = "0.2.0"
+version = "0.2.2"
 description = "Thorstens Teaching Tools"
 authors = ["Thorsten Vitt <thorsten.vitt@uni-wuerzburg.de>"]
 packages = [{include = "teaching" }]
@@ -17,8 +17,8 @@ ls-md = "teaching.ls_md:main"
 mailmerge = "teaching.mailmerge:main"
 mltmove = "teaching.mltmove:move_resources"
 similar-solutions = "teaching.similar_solutions:main"
-un2up = "teaching.un2up:main"
 unify-source = "teaching.unify_source:main"
+un2up = "teaching.un2up:main"
 video-thumbnail = "teaching.video_thumbnail:extract_thumbnail"
 xfiles-graph = "teaching.xfiles_graph:main"
 
@@ -39,6 +39,7 @@ PyPDF2 = "^2.7.0"
 astor = "^0.8.1"
 networkx = "^2.8.5"
 scipy = "^1.10.1"
+tqdm = "^4.64.1"
 
 [tool.poetry.dev-dependencies]
 

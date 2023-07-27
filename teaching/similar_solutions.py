@@ -9,7 +9,7 @@ import pandas as pd
 import scipy.cluster.hierarchy as sch
 import sys
 from tqdm import tqdm
-from unify_source import load_unified_source
+from .unify_source import load_unified_source
 from matplotlib import pyplot as plt
 import scipy.spatial.distance as ssd
 try:
