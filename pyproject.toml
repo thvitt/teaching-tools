@@ -23,6 +23,8 @@ video-thumbnail = "teaching.video_thumbnail:extract_thumbnail"
 xfiles-graph = "teaching.xfiles_graph:main"
 mix-words = "teaching.mix_words:main"
 fix-surrogates = "teaching.fix_surrogates:app"
+htmlindex = "teaching.htmlindex:app"
+run-with-server = "teaching.run_with_server:app"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -44,6 +46,8 @@ scipy = "^1.10.1"
 tqdm = "^4.64.1"
 openpyxl = "^3.1.2"
 typer = "^0.9.0"
+html5lib = "^1.1"
+humanize = "^4.9.0"
 
 [tool.poetry.dev-dependencies]
 
