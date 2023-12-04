@@ -52,6 +52,20 @@ files = [
 ]
 
 [[package]]
+name = "colour"
+version = "0.1.5"
+description = "converts and manipulates various color representation (HSL, RVB, web, X11, ...)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "colour-0.1.5-py2.py3-none-any.whl", hash = "sha256:33f6db9d564fadc16e59921a56999b79571160ce09916303d35346dddc17978c"},
+    {file = "colour-0.1.5.tar.gz", hash = "sha256:af20120fefd2afede8b001fbef2ea9da70ad7d49fafdb6489025dae8745c3aee"},
+]
+
+[package.extras]
+test = ["nose"]
+
+[[package]]
 name = "cycler"
 version = "0.11.0"
 description = "Composable style cycles"
@@ -348,6 +362,20 @@ packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
+
+[[package]]
+name = "matplotlib-backend-kitty"
+version = "2.1.2"
+description = "show matplotlib plots directly in your kitty terminal"
+optional = false
+python-versions = "*"
+files = [
+    {file = "matplotlib-backend-kitty-2.1.2.tar.gz", hash = "sha256:ab7d17ef00186c680a989af8c9be9fc8900a505f5c107dc7d9abc67b1a57f150"},
+    {file = "matplotlib_backend_kitty-2.1.2-py3-none-any.whl", hash = "sha256:6f11f1b734d64df3712539833072be6dc66e4112320974bf614d2dff5dc2e8b5"},
+]
+
+[package.dependencies]
+matplotlib = "*"
 
 [[package]]
 name = "more-itertools"
@@ -806,4 +834,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "a3458e6748a37b2ab1de3771429a983afff60728166c06088e8604e29e816461"
+content-hash = "f884532794bbd5090e96efe13d715596e9471d1f7bf431be7d86f46330bc1a63"

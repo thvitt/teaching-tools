@@ -1,9 +1,11 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import Annotated, Optional
+from inspect import signature
+from typing import Annotated, Callable, Iterable, Optional, TypeVar
 import html5lib
 import typer
 from pathlib import Path
+from colour import Color
 import xml.etree.ElementTree as ET
 from tqdm import tqdm as track
 import humanize
@@ -28,7 +30,7 @@ template = """
     text-decoration: underline;
   }
   tr:hover {
-      background-color: hsl(90, 30%, 80%); 
+      background-color: hsl(200, 30%, 90%); 
   }
 
   tr.ol {
@@ -94,6 +96,62 @@ def h(tag: str, *args, parent: Optional[ET.Element] = None, **attrib):
     return el
 
 
+T = TypeVar("T")
+
+
+def scale(
+    iterable: Iterable[T],
+    /,
+    *,
+    key=Callable[[T], int | float],
+    format: str | Callable[[float, T], str] | Callable[[float], str] | None = None,
+):
+    """
+    Scale each value in the given iterable to the interval [0.0 .. 1.0].
+
+
+    Args:
+        iterable: The items to be scaled. If they are not numbers, you must provide a key function.
+        key: optional one-argument function that converts a single item of the iterable to an arbitrary number
+        format: optional result formatter. This can be a format string or a function accepting up to three arguments.
+
+    Returns:
+        If no format is given, a list of floats between 0 and 1. Each entry maps to the
+        corresponding entry of the input iterable.
+
+        If a format function is given, it will be called once for each item to produce
+        the corresponding results: The first argument will be the scaled value,
+        the second argument the original item and the third argument the result of the key
+        function. It may accept less than three arguments.
+
+        If a format string is given, its .format() method will be called with three arguments
+        as above.
+    """
+    items = list(iterable)
+    if key is None:
+        values = items
+    else:
+        values = [key(it) for it in items]
+    smallest = min(values)
+    largest = max(values)
+    span = largest - smallest
+
+    if span:
+        scaled = [(value - smallest) / span for value in values]
+    else:
+        scaled = [1.0 for _ in values]
+
+    if format is None:
+        formatter = lambda x, _, __: x
+    elif isinstance(format, str):
+        formatter = format.format
+    else:
+        params = signature(format).parameters
+        param_count = min(3, len(params))
+        formatter = lambda *t: format(*t[:param_count])
+    return [formatter(*t) for t in zip(scaled, items, values)]
+
+
 @app.command()
 def prepare_index(
     files: list[Path],
@@ -126,7 +184,30 @@ def prepare_index(
     body = index.find("body")
     table = ET.SubElement(body, "table")
 
-    for title, paths in titles.items():
+    def format_date(ratio, path, timestamp):
+        mtime = datetime.fromtimestamp(timestamp)
+        return path, h(
+            "td",
+            mtime.strftime("%Y-%m-%d %H:%M"),
+            class_="time",
+            style=f"color:lab(50 {125-250*ratio:3.2f} -125);font-weight:bold",
+        )
+
+    def format_size(ratio, path, size):
+        return path, h(
+            "td",
+            humanize.naturalsize(size),
+            class_="size",
+            style=f"color:lab(50 {250*ratio-125:3.2f} 0);font-weight:bold",
+        )
+
+    dates = dict(scale(files, key=lambda p: p.stat().st_mtime, format=format_date))
+    sizes = dict(scale(files, key=lambda p: p.stat().st_size, format=format_size))
+
+    for (
+        title,
+        paths,
+    ) in titles.items():
         by_len = sorted(paths, key=lambda p: len(p.stem))
         path = by_len[0]
         variants = {p.stem.replace(path.stem, ""): p for p in by_len[1:]}
@@ -144,14 +225,21 @@ def prepare_index(
         tr.append(h("td", h1, class_="title"))
 
         mtime = datetime.fromtimestamp(path.stat().st_mtime)
-        tr.append(h("td", mtime.strftime("%Y-%m-%d %H:%M"), class_="time"))
-        tr.append(h("td", humanize.naturalsize(path.stat().st_size), class_="size"))
+        tr.append(dates[path])
+        tr.append(sizes[path])
 
         if variants:
             var_td = h("td", parent=tr, class_="variants")
             for label, var_path in variants.items():
                 var_td.append(h("span", " · "))
-                var_td.append(h("a", label, href=var_path.as_posix()))
+                var_td.append(
+                    h(
+                        "a",
+                        label,
+                        href=var_path.as_posix(),
+                        style=dates[var_path].attrib["style"],
+                    )
+                )
 
     result = ET.tostring(index, method="html", xml_declaration=False, encoding="utf-8")
 
