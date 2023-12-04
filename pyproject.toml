@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "teaching-tools"
-version = "0.4.1"
+version = "0.5.1"
 description = "Thorstens Teaching Tools"
 authors = ["Thorsten Vitt <thorsten.vitt@uni-wuerzburg.de>"]
 packages = [{include = "teaching" }]

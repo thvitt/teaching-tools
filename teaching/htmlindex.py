@@ -5,11 +5,11 @@ from typing import Annotated, Callable, Iterable, Optional, TypeVar
 import html5lib
 import typer
 from pathlib import Path
-from colour import Color
 import xml.etree.ElementTree as ET
 from tqdm import tqdm as track
 import humanize
 import re
+from multiprocessing import Pool
 
 
 app = typer.Typer()
@@ -169,9 +169,18 @@ def prepare_index(
         else:
             return 1
 
-    titles_ = []
-    for path in track(files, desc="Building index"):
-        titles_.append((path, get_heading(path)))
+    pool = Pool()
+    titles_ = zip(
+        files,
+        track(
+            pool.imap_unordered(get_heading, files),
+            desc="Parsing input files",
+            total=len(files),
+        ),
+    )
+    #    titles_ = []
+    # for path in track(files, desc="Building index"):
+    #    titles_.append((path, get_heading(path)))
 
     # group by equal title
     titles = defaultdict(list)
