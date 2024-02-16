@@ -4,8 +4,10 @@ from typing import List
 from lxml import etree
 
 import codecs
+import importlib.resources as resources
+import json
 import unicodedata
-from diffencoding import get_chars
+from .diffencoding import get_chars
 
 SVG_TEMPLATE = """
 <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -32,6 +34,10 @@ SVG_TEMPLATE = """
     text-align:center;
     text-anchor:middle;
     fill:#808080;
+}
+.glyph .shortcut {
+    font-size:2pt; 
+    font-family:monospace;
 }
   </style>
 
@@ -699,7 +705,7 @@ SVG_TEMPLATE = """
 """
 NS = dict(svg="http://www.w3.org/2000/svg")
 
-COLORS="""
+COLORS = """
 .L {fill:#fafaa0;}
 .Cc {fill:#fdedee;}
 .P {fill:#edfdee;}
@@ -707,32 +713,55 @@ COLORS="""
 .S {fill:#fdfded;}
 """
 
+
 def getargparser():
     parser = ArgumentParser(description="Creates SVG file with an encoding table")
-    parser.add_argument('svg', help="Output file")
-    parser.add_argument('-s', '--start', default=0, type=int, help="Start index")
-    parser.add_argument('-e', '--encoding', default='unicode', help="Encoding")
-    parser.add_argument('-c', '--colors', default=False, action='store_true',  help="Color by type")
+    parser.add_argument("svg", help="Output file")
+    parser.add_argument("-s", "--start", default=0, type=int, help="Start index")
+    parser.add_argument("-e", "--encoding", default="unicode", help="Encoding")
+    parser.add_argument(
+        "-f",
+        "--format",
+        default="{codepoint}",
+        help="cell caption format (vars: codepoint, char, cat)",
+    )
+    parser.add_argument(
+        "-c", "--colors", default=False, action="store_true", help="Color by type"
+    )
     return parser
 
 
-def prepare_svg(codepoints: List[int], chars: List[str]):
+def prepare_svg(codepoints: List[int], chars: List[str], fmt="{codepoint}"):
+    if fmt is None:
+        fmt = "{codepoint}"
     if len(codepoints) != 128:
         raise ValueError(f"Must pass list of 128 codepoints, not {len(codepoints)}")
     if len(chars) != 128:
         raise ValueError(f"Must pass list of 128 characters, not {len(chars)}")
+    with resources.files("teaching").joinpath("controls.json").open() as f:
+        controls: dict[str, dict[str, str]] = json.load(f)
     svg = etree.ElementTree(etree.fromstring(SVG_TEMPLATE))
     table = svg.xpath('//*[@id="table"]')[0]
     for cell, codepoint, char in zip(table.getchildren(), codepoints, chars):
         cat = unicodedata.category(char)
-        if char == '�':
-            cell[0].attrib['class'] += f' notdef'
-            cell[1][0].text = ' '
-            cell[2][0].text = ' '
+        if str(ord(char)) in controls:
+            shortcut = controls[str(ord(char))]["ISO"]
+            cell[0].attrib["class"] += f" {cat[0]} {cat}"
+            cell[1][0].text = shortcut
+            cell[1][0].attrib["class"] = "shortcut"
+            cell[2][0].text = fmt.format_map(
+                dict(codepoint=codepoint, char=shortcut, cat=cat)
+            )
+        elif char == "�":
+            cell[0].attrib["class"] += " notdef"
+            cell[1][0].text = " "
+            cell[2][0].text = " "
         else:
-            cell[0].attrib['class'] += f' {cat[0]} {cat}'
-            cell[1][0].text = char if cat[0] != 'C' else ''     # TODO support chars
-            cell[2][0].text = f'{codepoint}'
+            cell[0].attrib["class"] += f" {cat[0]} {cat}"
+            cell[1][0].text = char if cat[0] != "C" else ""  # TODO support chars
+            cell[2][0].text = fmt.format_map(
+                dict(codepoint=codepoint, char=char, cat=cat)
+            )
     return svg
 
 
@@ -740,12 +769,12 @@ def main():
     options = getargparser().parse_args()
     codepoints = list(range(options.start, options.start + 128))
     chars = list(get_chars(codepoints=codepoints, encoding=options.encoding))
-    svg = prepare_svg(codepoints, chars)
+    svg = prepare_svg(codepoints, chars, fmt=options.format)
     if options.colors:
-        style_el = svg.xpath('//svg:style', namespaces=NS)[0]
+        style_el = svg.xpath("//svg:style", namespaces=NS)[0]
         style_el.text += COLORS
     svg.write(options.svg, pretty_print=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
