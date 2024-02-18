@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="svg8" width="456.957" height="257.648" version="1.1" viewBox="0 0 457.859 257.648">
+    <defs id="defs776">
+        <marker id="marker5816" markerHeight="5.4" markerWidth="5.4" orient="auto" preserveAspectRatio="xMidYMid" refX="-1.881" refY="-.015" style="overflow:visible" viewBox="0 0 5.4 5.4">
+            <path id="path5814" d="M5 0c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.3-5 5-5c2.76 0 5 2.24 5 5z" style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:2" transform="scale(.45)"/>
+        </marker>
+        <marker id="marker9466" markerHeight="5" markerUnits="userSpaceOnUse" markerWidth="5" orient="auto" preserveAspectRatio="xMidYMid" refX="-2.328" refY="-.064" style="overflow:visible" viewBox="0 0 5.4 5.4">
+            <path id="path9464" d="M-2.25 0a2.25 2.25 0 0 0 4.5 0c0-1.242-1.035-2.25-2.25-2.25A2.25 2.25 0 0 0-2.25 0Z" style="fill:context-fill;fill-rule:evenodd;stroke:context-stroke;stroke-width:.9"/>
+        </marker>
+        <marker id="Arrow1L" markerHeight="5" markerWidth="8.75" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" refX="0" refY="0" style="overflow:visible" viewBox="0 0 8.75 5">
+            <path id="arrow1L" d="m0 0 5-5-17.5 5L5 5Z" style="fill:context-stroke;fill-rule:evenodd;stroke:none" transform="scale(-.5)"/>
+        </marker>
+    </defs>
+    <style id="style2455" type="text/css">
+        .cell {
+          fill: none;
+          stroke: #e0e0e0;
+          stroke-width: .26458332
+        }
+    
+        .codepoint,
+        .glyph {
+          text-align: center;
+          text-anchor: middle
+        }
+    
+        .glyph {
+          font-size: 4.93889px;
+          font-family: FreeSerif
+        }
+    
+        .codepoint {
+          font-size: 2.11667px;
+          font-family: Ubuntu;
+          fill: gray
+        }
+    
+        .L {
+          fill: #fafaa0
+        }
+    
+        .Cc {
+          fill: #fdedee
+        }
+    </style>
+    <g id="table" transform="translate(-101.774 -153.72)scale(1.06667)">
+        <g id="cellgroup60" transform="matrix(5.30252 0 0 5.29838 -46.702 -500.43)">
+            <path id="cellrect60" d="M63.5 127.667h7.056v10.583H63.5z" class="cell L Lu" transform="translate(-2.908 -4.394)"/>
+            <text xml:space="preserve" id="glyph60" x="64.111" y="128.559" class="glyph"><tspan id="glyph60ts" x="64.111" y="128.559">Œ</tspan></text>
+            <text id="codepoint60" x="64.171" y="132.909" class="codepoint"><tspan id="codepoint60ts" x="64.171" y="132.909">BC ¼</tspan></text>
+        </g>
+        <g id="cellgroup10" transform="matrix(5.30252 0 0 5.29838 32.088 -500.43)">
+            <path id="cellrect10" d="M63.5 127.667h7.056v10.583H63.5z" class="cell C Cc" style="fill:#fdedee;stroke:#e0e0e0;stroke-width:.264583" transform="translate(-2.908 -4.394)"/>
+            <text xml:space="preserve" id="glyph10" x="64.111" y="128.559" class="glyph" style="font-size:4.93889px;font-family:FreeSerif;text-align:center;text-anchor:middle"><tspan id="glyph10ts" x="64.111" y="128.559" style="font-size:2pt;font-family:&quot;Pragmata Pro&quot;">LF</tspan></text>
+            <text id="codepoint10" x="64.171" y="132.909" class="codepoint" style="font-size:2.11667px;font-family:Ubuntu;text-align:center;text-anchor:middle;fill:gray"><tspan id="codepoint10ts" x="64.171" y="132.909">0A LF</tspan></text>
+        </g>
+        <text xml:space="preserve" id="text3023" x="239.779" y="162.443" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:end;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:end;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3021" x="239.779" y="162.443" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:end;text-anchor:end;fill:#000;stroke:none;stroke-width:.939346">Glyphe im Zeichensatz</tspan></text>
+        <text xml:space="preserve" id="text3509" x="174.524" y="205.225" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:middle;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3507" x="174.524" y="205.225" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000;stroke:none;stroke-width:.939346">Codepoint (hexadezimal)</tspan></text>
+        <text xml:space="preserve" id="text3553" x="162.478" y="247.475" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3551" x="162.478" y="247.475" style="text-align:start;text-anchor:start;stroke-width:.939346">Unicode-/Latin1-Zeichen </tspan><tspan id="tspan3555" x="162.478" y="262.504" style="text-align:start;text-anchor:start;stroke-width:.939346">an diesem Codepoint</tspan></text>
+        <text xml:space="preserve" id="text3609" x="422.267" y="163.215" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3607" x="422.267" y="163.215" style="stroke-width:.939346">Abkürzung des</tspan><tspan id="tspan3611" x="422.267" y="178.244" style="stroke-width:.939346">Steuerzeichens</tspan><tspan id="tspan3613" x="422.267" y="193.274" style="stroke-width:.939346">(LF = Linefeed </tspan><tspan id="tspan3615" x="422.267" y="208.303" style="stroke-width:.939346">        = neue Zeile</tspan></text>
+        <text xml:space="preserve" id="text3619" x="349.518" y="241.186" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:12.5246px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3617" x="349.518" y="241.186" style="stroke-width:.939346">Farbcode der Zeichenklasse:</tspan></text>
+        <g id="g8506" transform="translate(7.514 .832)">
+            <g id="g4160" transform="translate(73.942 -1.213)">
+                <text xml:space="preserve" id="text3623" x="295.36" y="257.565" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3621" x="295.36" y="257.565" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Buchstabe</tspan></text>
+                <path id="cellrect60-5" d="M278.394 246.929h13.314v13.314h-13.314z" class="cell L"/>
+            </g>
+            <g id="g4155" transform="translate(73.942 -4.006)">
+                <text xml:space="preserve" id="text3627" x="295.383" y="279.986" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3625" x="295.383" y="279.986" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Steuerzeichen</tspan></text>
+                <path id="rect3832" d="M278.394 269.348h13.314v13.314h-13.314z" class="cell C Cc"/>
+            </g>
+            <g id="g4150" transform="translate(73.942 -6.799)">
+                <text xml:space="preserve" id="text3631" x="295.484" y="302.408" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3629" x="295.484" y="302.408" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Zahl</tspan></text>
+                <path id="rect3834" d="M278.394 291.768h13.314v13.314h-13.314z" class="cell Nl" style="fill:#ededfd"/>
+            </g>
+            <g id="g4145" transform="translate(73.942 -9.773)">
+                <text xml:space="preserve" id="text3635" x="295.405" y="324.83" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3633" x="295.405" y="324.83" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Interpunktion</tspan></text>
+                <path id="rect3836" d="M278.394 314.188h13.314v13.314h-13.314z" class="cell" style="fill:#edfdee"/>
+            </g>
+            <g id="g4140" transform="translate(73.942 -12.579)">
+                <text xml:space="preserve" id="text3639" x="295.383" y="347.251" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3637" x="295.383" y="347.251" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Symbol</tspan></text>
+                <path id="rect3838" d="M278.394 336.608h13.314v13.314h-13.314z" class="cell" style="fill:#fdfded"/>
+            </g>
+            <g id="g4135" transform="translate(73.942 -15.178)">
+                <text xml:space="preserve" id="text3643" x="295.405" y="369.673" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3641" x="295.405" y="369.673" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">Leerraum</tspan></text>
+                <path id="rect3840" d="M278.394 359.028h13.314v13.314h-13.314z" class="cell Z" style="fill:#fff"/>
+            </g>
+            <g id="g4130" transform="translate(75.05 -17.971)">
+                <text xml:space="preserve" id="text3647" x="295.586" y="392.094" style="color:#000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;line-height:120%;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000;writing-mode:lr-tb;text-anchor:start;overflow:visible;vector-effect:non-scaling-stroke;fill:#000;stroke:none;stroke-width:.939346;-inkscape-stroke:hairline"><tspan id="tspan3645" x="295.586" y="392.094" style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:11.2722px;font-family:&quot;TeX Gyre Pagella&quot;;-inkscape-font-specification:&quot;TeX Gyre Pagella, Normal&quot;;font-variant-ligatures:historical-ligatures;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:.939346">nicht definiert</tspan></text>
+                <path id="rect3842" d="M277.286 381.447H290.6v13.314h-13.314z" class="cell" style="fill:#222"/>
+            </g>
+        </g>
+        <path id="path4279" d="m244.72 161.215 30.313 6.47" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:.939346;marker-end:url(#Arrow1L)"/>
+        <path id="path4283" d="m249.69 203.331 22.725-2.153" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:.939346;marker-end:url(#Arrow1L)"/>
+        <path id="path4285" d="m289.708 234.5 7.736-24.22" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:.939346;marker-end:url(#Arrow1L)"/>
+        <path id="path4350" d="M304.071 238.407c24.827-6.827 58.676-12.793 69.976-28.66" style="color:#000;overflow:visible;fill:none;stroke:#000;stroke-width:.939346;marker-end:url(#Arrow1L)"/>
+        <path id="path4352" d="m419.152 175.049-34.082.186" style="color:#000;overflow:visible;fill:#000;stroke:#000;stroke-width:.939346;marker-end:url(#Arrow1L)"/>
+        <path id="path4401" d="m399.702 230.97-13.222-41.935" style="color:#000;overflow:visible;fill:none;stroke:#000;stroke-width:.939346;marker-end:url(#marker5816)"/>
+        <path id="path4403" d="m388.51 231.602-82.482-41.478" style="color:#000;overflow:visible;fill:none;stroke:#000;stroke-width:.939346;stroke-linecap:square;stroke-linejoin:bevel;marker-end:url(#marker9466)"/>
+    </g>
+</svg>

@@ -1,0 +1,68 @@
+Codec	Label	Aliases	Languages
+latin_1	Latin 1 (ISO 8859-1), entspricht Unicode U+0080 – U+00FF	iso-8859-1, iso8859-1, 8859, cp819, latin, latin1, L1	Western Europe
+cp1252	Windows Codepage 1252 (vgl. Latin 1)	windows-1252	Western Europe
+iso8859_2	ISO 8859-2 (Latin 2)	iso-8859-2, latin2, L2	Central and Eastern Europe
+iso8859_3	ISO 8859-3 (Latin 3)	iso-8859-3, latin3, L3	Esperanto, Maltese
+iso8859_4	ISO 8859-4 (Latin 4)	iso-8859-4, latin4, L4	Baltic languages
+iso8859_5	ISO 8859-5	iso-8859-5, cyrillic	Bulgarian, Byelorussian, Macedonian, Russian, Serbian
+iso8859_6	ISO 8859-6	iso-8859-6, arabic	Arabic
+iso8859_7	ISO 8859-7	iso-8859-7, greek, greek8	Greek
+iso8859_8	ISO 8859-8	iso-8859-8, hebrew	Hebrew
+iso8859_9	ISO 8859-9 (Latin 5)	iso-8859-9, latin5, L5	Turkish
+iso8859_10	ISO 8859-10 (Latin 6)	iso-8859-10, latin6, L6	Nordic languages
+iso8859_11	ISO 8859-11	iso-8859-11, thai	Thai languages
+iso8859_13	ISO 8859-13 (Latin 7)	iso-8859-13, latin7, L7	Baltic languages
+iso8859_14	ISO 8859-14 (Latin 8)	iso-8859-14, latin8, L8	Celtic languages
+iso8859_15	ISO 8859-15 (Latin 9)	iso-8859-15, latin9, L9	Western Europe
+iso8859_16	ISO 8859-16 (Latin 10)	iso-8859-16, latin10, L10	South-Eastern Europe
+cp1250	Windows Codepage 1250	windows-1250	Central and Eastern Europe
+cp1251	Windows Codepage 1251	windows-1251	Bulgarian, Byelorussian, Macedonian, Russian, Serbian
+cp1252	Windows Codepage 1252 (vgl. Latin 1)	windows-1252	Western Europe
+cp1253	Windows Codepage 1253	windows-1253	Greek
+cp1254	Windows Codepage 1254	windows-1254	Turkish
+cp1255	Windows Codepage 1255	windows-1255	Hebrew
+cp1256	Windows Codepage 1256	windows-1256	Arabic
+cp1257	Windows Codepage 1257	windows-1257	Baltic languages
+cp1258	Windows Codepage 1258	windows-1258	Vietnamese
+cp437	DOS Codepage 437	437, IBM437	English
+cp720	DOS Codepage 720		Arabic
+cp737	DOS Codepage 737		Greek
+cp775	DOS Codepage 775	IBM775	Baltic languages
+cp850	DOS Codepage 850	850, IBM850	Western Europe
+cp852	DOS Codepage 852	852, IBM852	Central and Eastern Europe
+cp855	DOS Codepage 855	855, IBM855	Bulgarian, Byelorussian, Macedonian, Russian, Serbian
+cp856	DOS Codepage 856		Hebrew
+cp857	DOS Codepage 857	857, IBM857	Turkish
+cp858	DOS Codepage 858	858, IBM858	Western Europe
+cp860	DOS Codepage 860	860, IBM860	Portuguese
+cp861	DOS Codepage 861	861, CP-IS, IBM861	Icelandic
+cp862	DOS Codepage 862	862, IBM862	Hebrew
+cp863	DOS Codepage 863	863, IBM863	Canadian
+cp864	DOS Codepage 864	IBM864	Arabic
+cp865	DOS Codepage 865	865, IBM865	Danish, Norwegian
+cp866	DOS Codepage 866	866, IBM866	Russian
+cp869	DOS Codepage 869	869, CP-GR, IBM869	Greek
+cp874	DOS Codepage 874		Thai
+cp875	DOS Codepage 875		Greek
+cp949	DOS Codepage 949	949, ms949, uhc	Korean
+cp037	IBM Codepage 037	IBM037, IBM039	English
+cp273	IBM Codepage 273	273, IBM273, csIBM273	German
+cp1006	IBM Codepage 1006		Urdu
+cp1026	IBM Codepage 1026	ibm1026	Turkish
+cp1125	IBM Codepage 1125	1125, ibm1125, cp866u, ruscii	Ukrainian
+cp1140	IBM Codepage 1140	ibm1140	Western Europe
+cp424	Codepage 424 (EBCDIC-CP-HE)	EBCDIC-CP-HE, IBM424	Hebrew
+cp500	IBM Codepage 500 (EBCDIC-CP-BE)	EBCDIC-CP-BE, EBCDIC-CP-CH, IBM500	Western Europe
+cp932	Windows Codepage 932	932, ms932, mskanji, ms-kanji	Japanese
+cp950	Windows Codepage 950	950, ms950	Traditional Chinese
+koi8_r	KOI-8 R		Russian
+koi8_t	KOI-8 T		Tajik
+koi8_u	KOI-8 U		Ukrainian
+kz1048	KZ-1048	kz_1048, strk1048_2002, rk1048	Kazakh
+mac_cyrillic	Mac OS Cyrillic	maccyrillic	Bulgarian, Byelorussian, Macedonian, Russian, Serbian
+mac_greek	Mac OS Greek	macgreek	Greek
+mac_iceland	Mac OS Iceland	maciceland	Icelandic
+mac_latin2	Mac OS Latin2	maclatin2, maccentraleurope, mac_centeuro	Central and Eastern Europe
+mac_roman	Mac OS Roman	macroman, macintosh	Western Europe
+mac_turkish	Mac OS Turkish	macturkish	Turkish
+ptcp154	PTCP 154	csptcp154, pt154, cp154, cyrillic-asian	Kazakh

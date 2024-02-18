@@ -3,11 +3,18 @@ from typing import List
 
 from lxml import etree
 
+import sys
+from os import fspath
 import codecs
+from textwrap import dedent
 import importlib.resources as resources
 import json
 import unicodedata
 from .diffencoding import get_chars
+import csv
+from pathlib import Path
+
+options = None
 
 SVG_TEMPLATE = """
 <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -21,10 +28,13 @@ SVG_TEMPLATE = """
     stroke:#E0E0E0;
     stroke-width:0.26458332;
 }
+.no_char, .no_char * {
+    display: none
+}
 
 .glyph {
     font-size:4.93889px;
-    font-family:Junicode;
+    font-family:FreeSerif;
     text-align:center;
     text-anchor:middle;
 }
@@ -37,7 +47,7 @@ SVG_TEMPLATE = """
 }
 .glyph .shortcut {
     font-size:2pt; 
-    font-family:monospace;
+    font-family:"Pragmata Pro";
 }
   </style>
 
@@ -711,69 +721,209 @@ COLORS = """
 .P {fill:#edfdee;}
 .N {fill:#ededfd;}
 .S {fill:#fdfded;}
+.Zs {fill:#ffffff;}
+.notdef {fill:#222222;}
 """
 
 
 def getargparser():
     parser = ArgumentParser(description="Creates SVG file with an encoding table")
-    parser.add_argument("svg", help="Output file")
+    parser.add_argument("svg", help="Output file or folder for -a", type=Path)
     parser.add_argument("-s", "--start", default=0, type=int, help="Start index")
     parser.add_argument("-e", "--encoding", default="unicode", help="Encoding")
     parser.add_argument(
         "-f",
         "--format",
         default="{codepoint}",
-        help="cell caption format (vars: codepoint, char, cat)",
+        help="cell caption format (vars: codepoint, char, cat, unichar)",
     )
     parser.add_argument(
         "-c", "--colors", default=False, action="store_true", help="Color by type"
     )
+    parser.add_argument(
+        "-a",
+        "--all-encodings",
+        help="Generate SVGs for many encodings and a markdown file for them as well",
+        default=False,
+        action="store_true",
+    )
     return parser
 
 
-def prepare_svg(codepoints: List[int], chars: List[str], fmt="{codepoint}"):
+def prepare_svg(
+    codepoints: List[int | None], chars: List[str], fmt="{codepoint:02X}   {unichar}"
+):
     if fmt is None:
         fmt = "{codepoint}"
-    if len(codepoints) != 128:
-        raise ValueError(f"Must pass list of 128 codepoints, not {len(codepoints)}")
-    if len(chars) != 128:
-        raise ValueError(f"Must pass list of 128 characters, not {len(chars)}")
+    if len(codepoints) > 128:
+        raise ValueError(
+            f"Cannot visualize more than 128 codepoints, you passed {len(codepoints)}"
+        )
+    if len(codepoints) > len(chars):
+        codepoints = codepoints[: len(chars)]
+    elif len(codepoints) < len(chars):
+        raise ValueError(f"{len(codepoints)} codepoints, but {len(chars)} characters")
+
+    if len(codepoints) < 128:
+        n_fill = 128 - len(codepoints)
+        codepoints.extend([None] * n_fill)
+        chars += " " * n_fill
+
     with resources.files("teaching").joinpath("controls.json").open() as f:
         controls: dict[str, dict[str, str]] = json.load(f)
+
+    def get_shortcut(ch: str | int):
+        if isinstance(ch, str) and len(ch) == 1:
+            key = str(ord(ch))
+        elif isinstance(ch, int):
+            key = str(ch)
+        else:
+            raise TypeError(f"{ch} must be an int or a character")
+        if key in controls:
+            return controls[key]["ISO"]
+        else:
+            return ""
+
     svg = etree.ElementTree(etree.fromstring(SVG_TEMPLATE))
     table = svg.xpath('//*[@id="table"]')[0]
     for cell, codepoint, char in zip(table.getchildren(), codepoints, chars):
+        if codepoint is None:
+            cell.attrib["class"] = "no_char"
+            cell[1][0].text = ""
+            continue
+
         cat = unicodedata.category(char)
-        if str(ord(char)) in controls:
-            shortcut = controls[str(ord(char))]["ISO"]
+        shortcut = get_shortcut(char)
+        unichar = get_shortcut(codepoint) or chr(codepoint) or "—"
+        caption = fmt.format_map(
+            dict(codepoint=codepoint, char=shortcut or char, cat=cat, unichar=unichar)
+        )
+        cell[2][0].text = caption
+        if shortcut:
             cell[0].attrib["class"] += f" {cat[0]} {cat}"
             cell[1][0].text = shortcut
             cell[1][0].attrib["class"] = "shortcut"
-            cell[2][0].text = fmt.format_map(
-                dict(codepoint=codepoint, char=shortcut, cat=cat)
-            )
         elif char == "�":
             cell[0].attrib["class"] += " notdef"
             cell[1][0].text = " "
-            cell[2][0].text = " "
         else:
             cell[0].attrib["class"] += f" {cat[0]} {cat}"
             cell[1][0].text = char if cat[0] != "C" else ""  # TODO support chars
-            cell[2][0].text = fmt.format_map(
-                dict(codepoint=codepoint, char=char, cat=cat)
-            )
     return svg
 
 
-def main():
-    options = getargparser().parse_args()
-    codepoints = list(range(options.start, options.start + 128))
-    chars = list(get_chars(codepoints=codepoints, encoding=options.encoding))
-    svg = prepare_svg(codepoints, chars, fmt=options.format)
+def _writeslide(target: Path, encoding, start=128, title=None, caption=""):
+    if title is None:
+        title = encoding
+
+    codepoints = list(range(start, start + 128))
+    chars = get_chars(codepoints=codepoints, encoding=encoding)
+    svg = prepare_svg(codepoints, chars)
+    filename = f"{encoding}.svg" if start == 128 else f"{encoding}{start}.svg"
+    svgfile = target / filename
+    write_svg(svg, svgfile)
+    return dedent(
+        f"""\
+    ## {title}
+
+    ![{caption}]({svgfile.relative_to(target.parent).with_suffix('.pdf')}){{height="80%"}}
+
+
+    """
+    )
+
+
+def full_encoding_doc(folder: Path):
+    ascii = get_chars(codepoints=range(0, 128))
+    folder = Path(folder)
+    images = folder / "img"
+    images.mkdir(exist_ok=True, parents=True)
+    with resources.files("teaching").joinpath("encoding-desc.tsv").open(
+        "r", encoding="utf-8"
+    ) as encodings, folder.joinpath("codepages.md").open("wt", encoding="utf-8") as out:
+        out.write("---\ntitle: Traditionelle 8-Bit-Zeichenkodierungen\n---\n\n")
+        out.write(
+            _writeslide(
+                images,
+                "ascii",
+                0,
+                "ASCII",
+                "Bei den meisten Encodings sind die ersten 128 Zeichen mit ASCII identisch",
+            )
+        )
+        next(encodings)  # skip header
+        for encoding, label, alias, lang in csv.reader(encodings, delimiter="\t"):
+            start = get_chars(encoding=encoding, codepoints=range(0, 128))
+            if start != ascii:
+                out.write(
+                    _writeslide(
+                        images,
+                        encoding,
+                        start=0,
+                        title=f"{label} (1)",
+                        caption=f"{label} (0–127, weicht von ASCII ab) ({lang})",
+                    )
+                )
+                title = f"{label} (2)"
+            else:
+                title = label
+            out.write(
+                _writeslide(
+                    images, encoding, title=title, caption=f"{label} (128–255) ({lang})"
+                )
+            )
+
+        images.joinpath("legende.svg").write_text(
+            resources.files("teaching").joinpath("legende.svg").read_text()
+        )
+        out.write(
+            dedent(
+                f"""\
+                  ## Legende
+
+                  ![Legende zu den Grafiken]({images.relative_to(folder) / 'legende.svg'})
+
+                  ## Quellen & Weitere Informationen
+
+                  Zu den Steuerzeichen gibt es eine informative [Wikipedia-Seite](https://en.wikipedia.org/wiki/C0_and_C1_control_codes). Die Tabelle [am Ende jener Seite](https://en.wikipedia.org/wiki/C0_and_C1_control_codes#Character_encodings) verweist für fast jede Codierung auf eine Seite mit Details und Hintergründen.
+
+                  Die Tabellen werden mit einem Python-Script befüllt, in dessen Zentrum diese Funktion steht:
+
+                  ```python
+                  def get_chars(*, codepoints: Iterable = range(256), encoding: str = "unicode"):
+                      if encoding == "unicode":
+                          return "".join(chr(n) for n in codepoints)
+                      else:
+                          octet_stream = bytes(codepoints)
+                          return codecs.decode(octet_stream, encoding=encoding, errors="replace")
+                  ```
+
+                  Das Ergebnis eines Aufrufs wie `get_chars(encoding='latin1')`{{.python}} ist ein 256 Zeichen langer String 
+                  mit den (Unicode-)Zeichen, die im [Encoding](https://docs.python.org/3/library/codecs.html#standard-encodings) _Latin 1_ an den Positionen 0 bis 255 stehen, nicht definierte
+                  Zeichen sind durch U+FFFD `�` ersetzt. Die [Zeichenklassen](http://www.unicode.org/reports/tr44/#General_Category_Values) können mit [`unicodedata.category(chr)`{{.python}}](https://docs.python.org/3/library/unicodedata.html#unicodedata.category) 
+                  abgefragt werden. 
+                  """
+            )
+        )
+
+
+def write_svg(svg, file):
     if options.colors:
         style_el = svg.xpath("//svg:style", namespaces=NS)[0]
         style_el.text += COLORS
-    svg.write(options.svg, pretty_print=True)
+    svg.write(fspath(file), pretty_print=True)
+
+
+def main():
+    global options
+    options = getargparser().parse_args()
+    if options.all_encodings:
+        full_encoding_doc(options.svg)
+    else:
+        codepoints = list(range(options.start, options.start + 128))
+        chars = list(get_chars(codepoints=codepoints, encoding=options.encoding))
+        svg = prepare_svg(codepoints, chars, fmt=options.format)
+        write_svg(svg, options.svg)
 
 
 if __name__ == "__main__":
