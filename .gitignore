@@ -172,3 +172,4 @@ venv.bak/
 .mypy_cache/
 /stuff/
 testaufgabe
+.pdm-python
