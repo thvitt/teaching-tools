@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:87ffbdae05e939c5f9ebe186e00ef10e0fffe16acc2a8ed098ae5e14ac2d4261"
+content_hash = "sha256:c4cdb90089c2076bf3ca435109a9babc54c26ad7f9290dc2ad8d78cc324ae86e"
 
 [[package]]
 name = "astor"
@@ -30,6 +30,16 @@ dependencies = [
 files = [
     {file = "blessings-1.7-py3-none-any.whl", hash = "sha256:b1fdd7e7a675295630f9ae71527a8ebc10bfefa236b3d6aa4932ee4462c17ba3"},
     {file = "blessings-1.7.tar.gz", hash = "sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d"},
+]
+
+[[package]]
+name = "chevron"
+version = "0.14.0"
+summary = "Mustache templating language renderer"
+groups = ["default"]
+files = [
+    {file = "chevron-0.14.0-py3-none-any.whl", hash = "sha256:fbf996a709f8da2e745ef763f482ce2d311aa817d287593a5b990d6d6e4f0443"},
+    {file = "chevron-0.14.0.tar.gz", hash = "sha256:87613aafdf6d77b6a90ff073165a61ae5086e21ad49057aa0e53681601800ebf"},
 ]
 
 [[package]]
