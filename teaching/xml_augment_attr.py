@@ -70,11 +70,11 @@ def copy_attribute(
     if None in nsmap:
         del nsmap[None]
 
-    for el in et.xpath(f"//*[@{src}]", namespaces=nsmap):
+    for el in doc.xpath(f"//*[@{src}]", namespaces=nsmap):
         value = el.get(expandns(src, nsmap))
-        el.set(expandmap(dst, nsmap), fmt.format(value))
+        el.set(expandns(dst, nsmap), fmt.format(value))
         if move:
-            del el.attrib[expandmap(src, nsmap)]
+            del el.attrib[expandns(src, nsmap)]
 
     if inline and not output:
         output = input
