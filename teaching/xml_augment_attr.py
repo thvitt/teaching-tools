@@ -1,4 +1,5 @@
 from typing import Annotated, Optional
+from sys import stderr
 from lxml import etree
 import typer
 
@@ -58,27 +59,67 @@ def copy_attribute(
             writable=True,
         ),
     ] = None,
-    inline: Annotated[
+    inplace: Annotated[
         bool,
         typer.Option(
             "-i", help="Modify the input file in place. Ignored if -o is given."
         ),
     ] = False,
+    printns: Annotated[
+        bool, typer.Option(help="Print the namespace prefix map to stderr.")
+    ] = False,
 ):
+    """
+    Edits the XML file INPUT by setting the DST attribute of all elements that have a
+    SRC attribute. SRC and DST may be prefixed QNames using one of the namespace
+    prefixes declared in the input document’s root element.
+    """
     doc = etree.parse(input)
     nsmap = dict(doc.getroot().nsmap)
     if None in nsmap:
         del nsmap[None]
 
+    opcount = 0
     for el in doc.xpath(f"//*[@{src}]", namespaces=nsmap):
         value = el.get(expandns(src, nsmap))
         el.set(expandns(dst, nsmap), fmt.format(value))
         if move:
             del el.attrib[expandns(src, nsmap)]
+        opcount += 1
 
-    if inline and not output:
+    if inplace and not output:
         output = input
     if output is None:
         print(etree.tounicode(doc))
     else:
         doc.write(output)
+
+    if printns:
+        print(
+            "Namespace prefixes available:", format_dict(nsmap), file=stderr, sep="\n"
+        )
+
+    if opcount:
+        print(
+            f"Augmented {opcount} elements that had an {src} attribute with {dst} attributes.",
+            file=stderr,
+        )
+    else:
+        print(
+            f"WARNING: No elements with a {src} ({expandns(src, nsmap)}) attribute found!",
+            file=stderr,
+        )
+
+
+def format_dict(d: dict) -> str:
+
+    formatted = {
+        str(key) if key is not None else "": str(value) for key, value in d.items()
+    }
+
+    keylen = max((len(key) for key in formatted))
+    lines = [
+        key + " " * (keylen - len(key)) + "\t" + value
+        for key, value in formatted.items()
+    ]
+    return "\n".join(lines)
