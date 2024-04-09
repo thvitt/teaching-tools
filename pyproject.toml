@@ -45,7 +45,7 @@ dependencies = [
     "chevron>=0.14.0",
 ]
 name = "teaching-tools"
-version = "0.5.1.dev2"
+version = "0.5.1.dev3"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
@@ -69,4 +69,4 @@ fix-surrogates = "teaching.fix_surrogates:app"
 htmlindex = "teaching.htmlindex:app"
 run-with-server = "teaching.run_with_server:app"
 klausur-feedback = "teaching.klausur_feedback:app"
-svg-label-to-id = "teaching.svg_label_to_id:app"
+xml-augment-attr = "teaching.xml_augment_attr:app"
