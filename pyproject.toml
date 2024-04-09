@@ -1,16 +1,24 @@
-[tool.pdm]
 [tool.pdm.dev-dependencies]
-dev = ["matplotlib-backend-kitty<3.0.0,>=2.1.2"]
+dev = [
+    "matplotlib-backend-kitty<3.0.0,>=2.1.2",
+    "lxml-stubs>=0.5.1",
+]
 
 [tool.pdm.build]
-includes = ["teaching"]
+includes = [
+    "teaching",
+]
+
 [build-system]
-requires = ["pdm-backend"]
+requires = [
+    "pdm-backend",
+]
 build-backend = "pdm.backend"
 
-
 [project]
-authors = [{ name = "Thorsten Vitt", email = "thorsten.vitt@uni-wuerzburg.de" }]
+authors = [
+    { name = "Thorsten Vitt", email = "thorsten.vitt@uni-wuerzburg.de" },
+]
 requires-python = "<3.12,>=3.10"
 dependencies = [
     "blessings<2.0,>=1.7",
@@ -37,7 +45,7 @@ dependencies = [
     "chevron>=0.14.0",
 ]
 name = "teaching-tools"
-version = "0.5.1"
+version = "0.5.1.dev2"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
@@ -61,3 +69,4 @@ fix-surrogates = "teaching.fix_surrogates:app"
 htmlindex = "teaching.htmlindex:app"
 run-with-server = "teaching.run_with_server:app"
 klausur-feedback = "teaching.klausur_feedback:app"
+svg-label-to-id = "teaching.svg_label_to_id:app"
