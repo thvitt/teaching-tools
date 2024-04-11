@@ -196,6 +196,8 @@ def add_attribute(
     - count: The number of items returned by the select expression
     - hash: A hash value calculated from the value
     """
+    if not match.startswith("/"):
+        match = "//" + match
     with load(input, output, inplace) as doc:
         nsmap = namespacemap(doc)
         for index, el in enumerate(doc.xpath(match, namespaces=nsmap), start=1):
