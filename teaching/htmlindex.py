@@ -12,6 +12,12 @@ import re
 from multiprocessing import Pool
 
 
+from typer.params import Option
+import logging
+
+logger = logging.getLogger()
+
+
 app = typer.Typer()
 
 template = """
@@ -72,6 +78,7 @@ template = """
 
 
 def get_heading(path: Path):
+    logger.debug("Parsing %s", path)
     doc = html5lib.parse(path.read_bytes(), namespaceHTMLElements=False)
     el = None
     for pattern in [".//h1", ".//h2", ".//h3", ".//p", ".//title"]:
@@ -160,7 +167,10 @@ def prepare_index(
         bool,
         typer.Option("-1", "--print-title", help="print only the first file’s title"),
     ] = False,
+    index_title: Annotated[Optional[str], typer.Option("-t", "--title")] = None,
+    verbose: Annotated[bool, typer.Option("-v", "--verbose", is_flag=True)] = False,
 ):
+    logging.basicConfig(level=logging.DEBUG if verbose else logging.WARNING)
     if print_title:
         heading = get_heading(files[0])
         if heading:
@@ -173,7 +183,7 @@ def prepare_index(
     titles_ = zip(
         files,
         track(
-            pool.imap_unordered(get_heading, files),
+            pool.imap(get_heading, files),
             desc="Parsing input files",
             total=len(files),
         ),
@@ -190,6 +200,10 @@ def prepare_index(
         title_els[h1.text] = h1
 
     index = html5lib.parse(template, namespaceHTMLElements=False)
+    if index_title:
+        title_el = index.find("title")
+        if title_el is not None:
+            title_el.text = index_title
     body = index.find("body")
     table = ET.SubElement(body, "table")
 
