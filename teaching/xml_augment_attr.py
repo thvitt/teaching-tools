@@ -55,14 +55,37 @@ def load(
         doc.write(output)
 
 
+def namespacemap(tree):
+    if hasattr(tree, "getroot"):
+        root = tree.getroot()
+    else:
+        root = tree
+    namespaces = dict(root.nsmap)
+    if None in namespaces:
+        default_ns = namespaces[None]
+        del namespaces[None]
+        if default_ns not in namespaces.values():
+            prefix_cand = root.tag
+            if "}" in prefix_cand:
+                prefix_cand = prefix_cand[prefix_cand.rfind("}") + 1 :]
+            if prefix_cand in namespaces:
+                prefix_cand = "root"
+            namespaces[prefix_cand] = default_ns
+    return namespaces
+
+
 @app.command("ns")
 def namespaces(input: str):
-    """Prints the namespaces and prefixes declared on the document’s root element."""
+    """
+    Prints the namespace prefixes that can be used with the other commands.
+
+    The namespaces are taken from the document’s root element, a prefix for
+    the default namespace is inferred, if necessary.
+    """
     with load(input, readonly=True) as doc:
         print(
             "Namespace prefixes on the document’s root element:",
-            format_dict(doc.getroot().nsmap),
-            "Note the default namespace is not available in attribute names and XPath expressions.",
+            format_dict(namespacemap(doc)),
             sep="\n\n",
             file=stderr,
         )
@@ -110,7 +133,7 @@ def copy_attribute(
     prefixes declared in the input document’s root element.
     """
     with load(input, output, inplace) as doc:
-        nsmap = dict(doc.getroot().nsmap)
+        nsmap = namespacemap(doc)
         if None in nsmap:
             del nsmap[None]
 
@@ -174,9 +197,7 @@ def add_attribute(
     - hash: A hash value calculated from the value
     """
     with load(input, output, inplace) as doc:
-        nsmap = dict(doc.getroot().nsmap)
-        if None in nsmap:
-            del nsmap[None]
+        nsmap = namespacemap(doc)
         for index, el in enumerate(doc.xpath(match, namespaces=nsmap), start=1):
             selection = el.xpath(select, namespaces=nsmap)
             value = stringify(selection)
