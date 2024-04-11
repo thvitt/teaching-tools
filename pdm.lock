@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:c4cdb90089c2076bf3ca435109a9babc54c26ad7f9290dc2ad8d78cc324ae86e"
+content_hash = "sha256:0f6a1d28af78b4e429eeca923f6a317f7940a98b8295b104969a093354ac7a4b"
 
 [[package]]
 name = "astor"
@@ -287,6 +287,16 @@ files = [
     {file = "lxml-4.9.4-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:c42ae7e010d7d6bc51875d768110c10e8a59494855c3d4c348b068f5fb81fdcd"},
     {file = "lxml-4.9.4-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:f10250bb190fb0742e3e1958dd5c100524c2cc5096c67c8da51233f7448dc137"},
     {file = "lxml-4.9.4.tar.gz", hash = "sha256:b1541e50b78e15fa06a2670157a1962ef06591d4c998b998047fff5e3236880e"},
+]
+
+[[package]]
+name = "lxml-stubs"
+version = "0.5.1"
+summary = "Type annotations for the lxml package"
+groups = ["dev"]
+files = [
+    {file = "lxml-stubs-0.5.1.tar.gz", hash = "sha256:e0ec2aa1ce92d91278b719091ce4515c12adc1d564359dfaf81efa7d4feab79d"},
+    {file = "lxml_stubs-0.5.1-py3-none-any.whl", hash = "sha256:1f689e5dbc4b9247cb09ae820c7d34daeb1fdbd1db06123814b856dae7787272"},
 ]
 
 [[package]]

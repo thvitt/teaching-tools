@@ -45,7 +45,7 @@ dependencies = [
     "chevron>=0.14.0",
 ]
 name = "teaching-tools"
-version = "0.5.1.dev3"
+version = "0.5.1.dev4"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
