@@ -1,25 +1,16 @@
 [tool.pdm.dev-dependencies]
-dev = [
-    "matplotlib-backend-kitty<3.0.0,>=2.1.2",
-    "lxml-stubs>=0.5.1",
-]
+dev = ["matplotlib-backend-kitty<3.0.0,>=2.1.2", "lxml-stubs>=0.5.1"]
 
 [tool.pdm.build]
-includes = [
-    "teaching",
-]
+includes = ["teaching"]
 
 [build-system]
-requires = [
-    "pdm-backend",
-]
+requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project]
-authors = [
-    { name = "Thorsten Vitt", email = "thorsten.vitt@uni-wuerzburg.de" },
-]
-requires-python = "<3.12,>=3.10"
+authors = [{ name = "Thorsten Vitt", email = "thorsten.vitt@uni-wuerzburg.de" }]
+requires-python = ">=3.10"
 dependencies = [
     "blessings<2.0,>=1.7",
     "more-itertools<9.0.0,>=8.13.0",
@@ -43,13 +34,15 @@ dependencies = [
     "humanize<5.0.0,>=4.9.0",
     "colour<1.0.0,>=0.1.5",
     "chevron>=0.14.0",
+    "odfpy>=1.4.1",
 ]
 name = "teaching-tools"
-version = "0.5.1.dev4"
+version = "0.5.3.dev0"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
 aufgabe-bewertung = "teaching.aufgabe_bewertung:main"
+table2bewertung = "teaching.tabletobewertung:app"
 aushang = "teaching.aushang:main"
 bewertung-merge = "teaching.bewertung_merge:main"
 diffencoding = "teaching.diffencoding:report_diff"
@@ -70,3 +63,4 @@ htmlindex = "teaching.htmlindex:app"
 run-with-server = "teaching.run_with_server:app"
 klausur-feedback = "teaching.klausur_feedback:app"
 xml-augment-attr = "teaching.xml_augment_attr:app"
+xml2dot = "teaching.xml2dot:main"
