@@ -159,7 +159,7 @@ def unzip_file(archive_, target_):
     for entry in zipfile.infolist():
         file = Path(zipfile.extract(entry, target))
         if file.suffix == ".zip":
-            subzip_target = file.parent / file.name
+            subzip_target = file.parent / file.stem
             subzip_target.mkdir(exist_ok=True, parents=True)
             ZipFile(file).extractall(subzip_target)
     shutil.copy2(moodle_csv, target)
