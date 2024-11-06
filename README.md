@@ -4,7 +4,7 @@ This repository contains a few scripts that I use primarily to support teaching 
 
 This is mostly hacky and probably not suited for anybody except me.
 
-To install, install this package using pip or poetry. Each script is a module in the package 'teaching' and a script that is installed to …/bin.
+To install, use something like `uv tool install git+https://github.com/thvitt/teaching-tools` or `pipx install git+https://github.com/thvitt/teaching-tools`.
 
 ## Visualization
 
