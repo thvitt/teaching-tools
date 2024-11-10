@@ -5,10 +5,7 @@ dev = ["matplotlib-backend-kitty<3.0.0,>=2.1.2", "lxml-stubs>=0.5.1"]
 includes = ["teaching"]
 
 [tool.uv]
-dev-dependencies = [
-    "lxml-stubs>=0.5.1",
-    "matplotlib-backend-kitty>=2.1.2",
-]
+dev-dependencies = ["lxml-stubs>=0.5.1", "matplotlib-backend-kitty>=2.1.2"]
 
 [build-system]
 requires = ["pdm-backend"]
@@ -30,7 +27,7 @@ dependencies = [
   "tabulate<1.0.0,>=0.8.10",
   "PyPDF2<3.0.0,>=2.7.0",
   "astor<1.0.0,>=0.8.1",
-  "networkx<3.0.0,>=2.8.5",
+  "networkx>=2.8.5,<3.0.0",
   "scipy<2.0.0,>=1.10.1",
   "tqdm<5.0.0,>=4.64.1",
   "openpyxl<4.0.0,>=3.1.2",
@@ -41,9 +38,11 @@ dependencies = [
   "chevron>=0.14.0",
   "odfpy>=1.4.1",
   "sqlalchemy>=2.0.36",
+  "pygraphviz>=1.14",
+  "cyclopts>=2.9.9",
 ]
 name = "teaching-tools"
-version = "0.6.0.dev0"
+version = "0.6.1.dev0"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
@@ -71,3 +70,4 @@ klausur-feedback = "teaching.klausur_feedback:app"
 xml-augment-attr = "teaching.xml_augment_attr:app"
 xml2dot = "teaching.xml2dot:main"
 sql2er = "teaching.sql2er:main"
+vis-make = "teaching.visualise_make:app"
