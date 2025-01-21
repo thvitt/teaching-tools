@@ -11,9 +11,9 @@ from rich.syntax import Syntax
 from cyclopts import App, Parameter
 from pathlib import Path
 
-app = App()
-
 logger = logging.getLogger(__name__)
+
+app = App()
 
 
 def next_uncommented_line(lines: Iterable[str]) -> str:
@@ -86,12 +86,12 @@ def parse_database(
             commandline = next_uncommented_line(lines[lineno + 1 :])
             if commandline.startswith("\t"):
                 command = shlex.split(commandline[1:])[0]
-                graph.add_edge(deps[0], target, cmdline=commandline, command=command)
+                graph.add_edge(target, deps[0], cmdline=commandline, command=command)
                 for dep in deps[1:]:
-                    graph.add_edge(dep, target, style="dashed", related=deps[0])
+                    graph.add_edge(target, dep, style="dashed", related=deps[0])
             else:
                 for dep in deps:
-                    graph.add_edge(dep, target)
+                    graph.add_edge(target, dep)
             logger.debug(
                 "%d: Adding target %s with deps %s, next line is '%s'",
                 lineno,
@@ -172,14 +172,26 @@ def parse_trace(targets: list[str] | None = None):
     return graph
 
 
-@app.default
-def main(
-    targets: list[str] | None = None,
-    *,
-    all: Annotated[bool, Parameter(["-a", "--all"])] = False,
+@app.command
+def root_targets(
     cd: Annotated[Path | None, Parameter(["-C", "--directory"])] = None,
     verbose: bool = False,
     debug: bool = False,
+):
+    """
+    List the root targets of the makefile
+    """
+    init(cd, debug, verbose)
+    graph = parse_database()
+    for node in nx.topological_sort(graph):
+        if graph.in_degree(node) == 0:
+            print(node)
+
+
+def init(
+    cd: Annotated[Path | None, Parameter(["-C", "--directory"])],
+    debug: bool,
+    verbose: bool,
 ):
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO if verbose else logging.WARNING,
@@ -190,5 +202,17 @@ def main(
     )
     if cd:
         chdir(cd)
+
+
+@app.default
+def main(
+    targets: list[str] | None = None,
+    *,
+    all: Annotated[bool, Parameter(["-a", "--all"])] = False,
+    cd: Annotated[Path | None, Parameter(["-C", "--directory"])] = None,
+    verbose: bool = False,
+    debug: bool = False,
+):
+    init(cd, debug, verbose)
     graph = parse_trace(targets)
     print(nx.nx_agraph.to_agraph(graph).to_string())
