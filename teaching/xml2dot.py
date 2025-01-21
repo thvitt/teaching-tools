@@ -3,7 +3,7 @@ Generate a tree representation from an XML file.
 You can pass three kinds of parameters: 
 
 * one XML file name (required)
-* options for graphviz dot, starting with a '-' and consisting of one word, e.g. -otree.pdf -Nfont="Fira Mono"
+* options for graphviz dot, starting with a '-' and consisting of one word, e.g. -Tpdf -otree.pdf -Nfontname="Fira Mono"
 * parameters as key=value pair, quoted if the values contain whitespace, to influence the generated graph.
 """
 
@@ -63,7 +63,7 @@ def help():
     with files("teaching").joinpath("xml2dot.xsl").open("r") as xslt:
         tree = ET.parse(xslt)
     params = tree.findall(
-        ".//xsl:param", {"xsl": "http://www.w3.org/1999/XSL/Transform"}
+        "./xsl:param", {"xsl": "http://www.w3.org/1999/XSL/Transform"}
     )
     for param in params:
         print(f"{param.get("name"):>20}={param.text}", file=sys.stderr)
