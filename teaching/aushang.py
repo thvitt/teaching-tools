@@ -95,7 +95,7 @@ def main():
             if options.print is not None:
                 lp_args= ['lp']
                 if options.print:
-                    lp_args.extend('-d', options.print)
+                    lp_args.extend(['-d', options.print])
                 lp_args.append(fspath(pdffile))
                 print("Printing: ", *lp_args)
                 subprocess.run(lp_args, cwd=tmpdir)
