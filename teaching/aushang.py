@@ -104,10 +104,12 @@ def main():
             if options.output:
                 shutil.move(pdffile, options.output)
             elif options.print is None:
-                proc = subprocess.run(['xdg-open', "-s", fspath(pdffile)])
+                drun = shutil.which("drun")
+                if drun:
+                    subprocess.run([drun, "-s", fspath(pdffile)])
+                else:
+                    subprocess.run(['xdg-open', fspath(pdffile)])
                 sleep(1)
-                if proc.returncode == 1:
-                    proc = subprocess.run(['xdg-open', fspath(pdffile)])
     except subprocess.CalledProcessError as e:
         print('{} failed with error {}.'.format(e.cmd, e.returncode), e.stdout, e.stderr, sep='\n\n', file=sys.stderr)
         sys.exit(e.returncode)
