@@ -40,6 +40,7 @@ dependencies = [
   "sqlalchemy>=2.0.36",
   "pygraphviz>=1.14",
   "cyclopts>=2.9.9",
+  "charset-normalizer>=3.4.1",
 ]
 name = "teaching-tools"
 version = "0.6.1.dev0"
