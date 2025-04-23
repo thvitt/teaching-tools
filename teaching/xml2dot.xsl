@@ -11,6 +11,7 @@
   <xsl:param name="attribute">shape=record, color=3</xsl:param>
   <xsl:param name="attribute-edge">style="dashed",dir="none"</xsl:param>
   <xsl:param name="text">shape=plaintext, fontcolor=4, labeljust=l</xsl:param>
+  <xsl:param name="whitespace"></xsl:param>
   <xsl:param name="comment">shape=note, color=5, labeljust=l</xsl:param>
   <xsl:param name="pi">shape=diamond, color=6</xsl:param>
   <xsl:param name="shorten-min" as="xs:integer">20</xsl:param>
@@ -51,12 +52,17 @@
   </xsl:template>
 
   <xsl:template match="text()">
-    <xsl:if test="normalize-space() != ''">
-      <xsl:variable name="content_"
-        select="replace(replace(normalize-space(.), '\\', '\\\\'), '&quot;', '\\&quot;')" />
-      <xsl:variable
-        name="content" select="t:shorten($content_, $shorten-min, $shorten-max, 'end')" />
-      {generate-id(.)} [label="{$content}", {$text}]; {generate-id(..)} -&gt; {generate-id(.)}; </xsl:if>
+    <xsl:choose>
+      <xsl:when test="normalize-space() != ''">
+        <xsl:variable name="content_"
+          select="replace(replace(normalize-space(.), '\\', '\\\\'), '&quot;', '\\&quot;')" />
+        <xsl:variable
+          name="content" select="t:shorten($content_, $shorten-min, $shorten-max, 'end')" />
+        {generate-id(.)} [label="{$content}", {$text}]; {generate-id(..)} -&gt; {generate-id(.)}; </xsl:when>
+      <xsl:when test="$whitespace != ''">
+        {generate-id(.)} [label="{$whitespace}", {$text}]; {generate-id(..)} -&gt; {generate-id(.)}; </xsl:when>
+      <xsl:otherwise />
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="@*"> {generate-id(.)} [label="{name()}|{t:shorten(., 20, 20, 'middle')}",

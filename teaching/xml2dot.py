@@ -1,6 +1,6 @@
 """
 Generate a tree representation from an XML file.
-You can pass three kinds of parameters: 
+You can pass three kinds of parameters:
 
 * one XML file name (required)
 * options for graphviz dot, starting with a '-' and consisting of one word, e.g. -Tpdf -otree.pdf -Nfontname="Fira Mono"
@@ -66,7 +66,7 @@ def help():
         "./xsl:param", {"xsl": "http://www.w3.org/1999/XSL/Transform"}
     )
     for param in params:
-        print(f"{param.get("name"):>20}={param.text}", file=sys.stderr)
+        print(f"{param.get('name'):>20}={param.text}", file=sys.stderr)
 
 
 def main() -> None:
