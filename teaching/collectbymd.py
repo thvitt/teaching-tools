@@ -21,6 +21,8 @@ def collect_by_md(
     *,
     output: Annotated[Path, Parameter(["-o", "--output"])] = Path(),
     query: Annotated[str | None, Parameter(["-q", "--query"])] = None,
+    sample_by: Annotated[str | None, Parameter(["-s", "--sample-by"])] = None,
+    sample_size: Annotated[int, Parameter(["-n", "--sample-size"])] = 1,
     verbose: Annotated[bool, Parameter(["-v", "--verbose"])] = False,
 ):
     """
@@ -32,6 +34,8 @@ def collect_by_md(
         targets: Pattern string to identify the target files. May contain metadata fields from the CSV file like {id}.
         output: root directory for the target files.
         query: pandas query, select only those files.
+        sample_by: group by this column and randomly select sample-size items from each group
+        sample_size: number of items to sample from each group
         verbose: Report what is done, not only errors or warnings.
     """
     logging.basicConfig(
@@ -51,6 +55,19 @@ def collect_by_md(
     if query:
         md.query(query, inplace=True)
         logger.info("%d remain after query %s", md.index.size, query)
+    if sample_by is not None:
+        md = (
+            md.groupby(sample_by)
+            .apply(pd.DataFrame.sample, n=sample_size)
+            .reset_index(drop=True)
+        )
+        logger.info(
+            "Grouped by %s and sampled %d files from each group, selecting a total of %d files",
+            sample_by,
+            sample_size,
+            md.index.size,
+        )
+
     target = output
 
     for _, row in progress.track(md.iterrows(), total=md.index.size, transient=True):

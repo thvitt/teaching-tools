@@ -44,7 +44,7 @@ dependencies = [
   "shtab>=1.7.2",
 ]
 name = "teaching-tools"
-version = "0.9.0"
+version = "0.9.1"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
