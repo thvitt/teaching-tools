@@ -44,7 +44,7 @@ dependencies = [
   "shtab>=1.7.2",
 ]
 name = "teaching-tools"
-version = "0.7.0.dev0"
+version = "0.8.0"
 description = "Thorstens Teaching Tools"
 
 [project.scripts]
@@ -74,3 +74,4 @@ xml2dot = "teaching.xml2dot:main"
 sql2er = "teaching.sql2er:main"
 vis-make = "teaching.visualise_make:app"
 tsvformat = "teaching.tsvformat:app"
+collect-by-md = "teaching.collectbymd:app"
