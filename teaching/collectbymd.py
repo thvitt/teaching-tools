@@ -12,6 +12,15 @@ logger = logging.getLogger(__name__)
 app = App()
 
 
+def safe_sample(df: pd.DataFrame, n: int) -> pd.DataFrame:
+    n_ = min(n, df.index.size)
+    if n_ != n:
+        logger.warning(
+            "%s: %d items requested, only %d items available", df.name, n, n_
+        )
+    return df.sample(n=n_)
+
+
 @app.default
 def collect_by_md(
     metadata: Path,
@@ -58,7 +67,7 @@ def collect_by_md(
     if sample_by is not None:
         md = (
             md.groupby(sample_by)
-            .apply(pd.DataFrame.sample, n=sample_size)
+            .apply(safe_sample, n=sample_size)
             .reset_index(drop=True)
         )
         logger.info(
