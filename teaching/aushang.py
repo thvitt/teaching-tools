@@ -10,6 +10,8 @@ from string import Template
 from tempfile import TemporaryDirectory
 from time import sleep
 
+import shtab
+
 template = Template(r"""
 \documentclass[paper=a4,paper=landscape,headheight=2.5cm,headinclude,fontsize=12pt,DIV16]{scrartcl}
 \usepackage{polyglossia}
@@ -67,35 +69,51 @@ $content
 
 \end{document}
 """)
-spacer = '\n\n\\vspace{\\fill}\n\n'
+spacer = "\n\n\\vspace{\\fill}\n\n"
 
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument('message', nargs='+')
-    parser.add_argument('-o', '--output', type=Path, metavar='PDF', help='save pdf here')
-    parser.add_argument('-t', '--tex', type=Path, help='save intermediate tex file')
-    parser.add_argument('-p', '--print', nargs='?', const='', metavar='PRINTER')
-    parser.add_argument('-d', '--date', default=r'\today', help='Message for the date line')
+    parser.add_argument("message", nargs="+")
+    parser.add_argument(
+        "-o", "--output", type=Path, metavar="PDF", help="save pdf here"
+    )
+    parser.add_argument("-t", "--tex", type=Path, help="save intermediate tex file")
+    parser.add_argument("-p", "--print", nargs="?", const="", metavar="PRINTER")
+    parser.add_argument(
+        "-d", "--date", default=r"\today", help="Message for the date line"
+    )
+    shtab.add_argument_to(parser)
     options = parser.parse_args()
 
-    tex_string = template.substitute(dict(date=options.date,
-                                          title=options.message[0],
-                                          content=(spacer + spacer.join(options.message[1:]))
-                                                    if len(options.message) > 1 else ''))
+    tex_string = template.substitute(
+        {
+            "date": options.date,
+            "title": options.message[0],
+            "content": (spacer + spacer.join(options.message[1:]))
+            if len(options.message) > 1
+            else "",
+        }
+    )
 
     try:
-        with TemporaryDirectory(prefix='aushang-') as _tmpdir:
+        with TemporaryDirectory(prefix="aushang-") as _tmpdir:
             tmpdir = Path(_tmpdir)
-            texfile = tmpdir / 'aushang.tex'
+            texfile = tmpdir / "aushang.tex"
             texfile.write_text(tex_string)
-            process = subprocess.run(['lualatex', '--interaction=nonstopmode', texfile], input='', capture_output=True,
-                                     cwd=tmpdir, encoding='utf-8', check=True)
-            pdffile = texfile.with_suffix('.pdf')
+            process = subprocess.run(
+                ["lualatex", "--interaction=nonstopmode", texfile],
+                input="",
+                capture_output=True,
+                cwd=tmpdir,
+                encoding="utf-8",
+                check=True,
+            )
+            pdffile = texfile.with_suffix(".pdf")
             if options.print is not None:
-                lp_args= ['lp']
+                lp_args = ["lp"]
                 if options.print:
-                    lp_args.extend(['-d', options.print])
+                    lp_args.extend(["-d", options.print])
                 lp_args.append(fspath(pdffile))
                 print("Printing: ", *lp_args)
                 subprocess.run(lp_args, cwd=tmpdir)
@@ -108,13 +126,18 @@ def main():
                 if drun:
                     subprocess.run([drun, "-s", fspath(pdffile)])
                 else:
-                    subprocess.run(['xdg-open', fspath(pdffile)])
+                    subprocess.run(["xdg-open", fspath(pdffile)])
                 sleep(1)
     except subprocess.CalledProcessError as e:
-        print('{} failed with error {}.'.format(e.cmd, e.returncode), e.stdout, e.stderr, sep='\n\n', file=sys.stderr)
+        print(
+            "{} failed with error {}.".format(e.cmd, e.returncode),
+            e.stdout,
+            e.stderr,
+            sep="\n\n",
+            file=sys.stderr,
+        )
         sys.exit(e.returncode)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

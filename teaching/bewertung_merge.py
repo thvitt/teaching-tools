@@ -12,6 +12,7 @@ import argparse
 import sys
 
 from pandas.core.common import inspect
+import shtab
 
 
 def first_index_above(value: float, limits: list[float]):
@@ -156,6 +157,7 @@ def _getargparser() -> argparse.ArgumentParser:
         help="Help on selected grader and config",
         action="store_true",
     )
+    shtab.add_argument_to(p)
     return p
 
 

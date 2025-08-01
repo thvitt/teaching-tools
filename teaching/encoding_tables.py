@@ -10,6 +10,8 @@ from textwrap import dedent
 import importlib.resources as resources
 import json
 import unicodedata
+
+import shtab
 from .diffencoding import get_chars
 import csv
 from pathlib import Path
@@ -728,6 +730,7 @@ COLORS = """
 
 def getargparser():
     parser = ArgumentParser(description="Creates SVG file with an encoding table")
+    shtab.add_argument_to(parser)
     parser.add_argument("svg", help="Output file or folder for -a", type=Path)
     parser.add_argument("-s", "--start", default=0, type=int, help="Start index")
     parser.add_argument("-e", "--encoding", default="unicode", help="Encoding")
@@ -826,7 +829,7 @@ def _writeslide(target: Path, encoding, start=128, title=None, caption=""):
         f"""\
     ## {title}
 
-    ![{caption}]({svgfile.relative_to(target.parent).with_suffix('.pdf')}){{height="80%"}}
+    ![{caption}]({svgfile.relative_to(target.parent).with_suffix(".pdf")}){{height="80%"}}
 
 
     """
@@ -838,9 +841,12 @@ def full_encoding_doc(folder: Path):
     folder = Path(folder)
     images = folder / "img"
     images.mkdir(exist_ok=True, parents=True)
-    with resources.files("teaching").joinpath("encoding-desc.tsv").open(
-        "r", encoding="utf-8"
-    ) as encodings, folder.joinpath("codepages.md").open("wt", encoding="utf-8") as out:
+    with (
+        resources.files("teaching")
+        .joinpath("encoding-desc.tsv")
+        .open("r", encoding="utf-8") as encodings,
+        folder.joinpath("codepages.md").open("wt", encoding="utf-8") as out,
+    ):
         out.write("---\ntitle: Traditionelle 8-Bit-Zeichenkodierungen\n---\n\n")
         out.write(
             _writeslide(
@@ -881,7 +887,7 @@ def full_encoding_doc(folder: Path):
                 f"""\
                   ## Legende
 
-                  ![Legende zu den Grafiken]({images.relative_to(folder) / 'legende.svg'})
+                  ![Legende zu den Grafiken]({images.relative_to(folder) / "legende.svg"})
 
                   ## Quellen & Weitere Informationen
 

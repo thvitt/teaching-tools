@@ -8,6 +8,7 @@ from getpass import getpass
 from csv import DictReader
 import pymustache
 import argparse
+import shtab
 
 import sys
 
@@ -17,6 +18,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     description="Simple Mass-Mailer",
 )
+shtab.add_argument_to(parser)
 parser.add_argument(
     "template",
     type=argparse.FileType(),

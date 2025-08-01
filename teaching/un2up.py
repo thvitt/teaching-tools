@@ -21,13 +21,21 @@ from tempfile import TemporaryFile, NamedTemporaryFile
 from typing import IO, BinaryIO
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
+import shtab
+
 
 def get_argparser():
     parser = ArgumentParser()
-    parser.add_argument('input', type=FileType('rb'))
-    parser.add_argument('output', type=FileType('wb'))
-    parser.add_argument('-r', '--reverse-order', default=False, action='store_true',
-                        help='dump upper / right page first')
+    parser.add_argument("input", type=FileType("rb"))
+    parser.add_argument("output", type=FileType("wb"))
+    parser.add_argument(
+        "-r",
+        "--reverse-order",
+        default=False,
+        action="store_true",
+        help="dump upper / right page first",
+    )
+    shtab.add_argument_to(parser)
     return parser
 
 
@@ -39,17 +47,17 @@ def split_pages(input: BinaryIO, reverseOrder: bool = False) -> PdfFileWriter:
         page2 = copy.copy(page)
         w, h = page.mediaBox.upperRight
         landscape = w >= h
-        rotation = page.get('/Rotate')
-        logger.info('Page %d: landscape=%s, rotation=%s', i, landscape, rotation)
+        rotation = page.get("/Rotate")
+        logger.info("Page %d: landscape=%s, rotation=%s", i, landscape, rotation)
         if landscape:
             page.mediaBox.lowerLeft = (0, 0)
-            page.mediaBox.upperRight = (w/2, h)
-            page2.mediaBox.lowerLeft = (w/2, 0)
+            page.mediaBox.upperRight = (w / 2, h)
+            page2.mediaBox.lowerLeft = (w / 2, 0)
             page2.mediaBox.upperRight = (w, h)
         else:
             page.mediaBox.lowerLeft = (0, 0)
-            page.mediaBox.upperRight = (w, h/2)
-            page2.mediaBox.lowerLeft = (0, h/2)
+            page.mediaBox.upperRight = (w, h / 2)
+            page2.mediaBox.lowerLeft = (0, h / 2)
             page2.mediaBox.upperRight = (w, h)
 
         if reverseOrder:
@@ -70,8 +78,9 @@ def main():
     if options.output:
         result.write(options.output)
     else:
-        with open('out.pdf', 'cb') as output:
+        with open("out.pdf", "cb") as output:
             result.write(output)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

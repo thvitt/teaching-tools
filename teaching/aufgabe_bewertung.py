@@ -11,6 +11,8 @@ from blessings import Terminal
 from more_itertools import one
 from zipfile import ZipFile
 
+import shtab
+
 try:
     from readchar import key, readkey
 except ImportError as e:
@@ -279,7 +281,7 @@ def augment_moodle_csv(
     missed = set(by_name) - found
     if missed:
         print(
-            f'!!! {len(missed)} Bewertete sind nicht der Kurstabelle: {", ".join(missed)}'
+            f"!!! {len(missed)} Bewertete sind nicht der Kurstabelle: {', '.join(missed)}"
         )
 
 
@@ -340,7 +342,10 @@ def getargparser():
         help="die Bewertungsergebnisse interaktiv präsentieren und kopieren",
     )
 
-    parser.add_argument("-x", "--extract", nargs=2, help="Abgaben extrahieren")
+    parser.add_argument(
+        "-x", "--extract", nargs=2, help="Abgaben extrahieren"
+    ).complete = shtab.FILE
+    shtab.add_argument_to(parser)
     return parser
 
 
