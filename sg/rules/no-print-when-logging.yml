@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: no-print-when-logging
+message: This module uses logging, do you really want to print here?
+severity: warning # error, warning, info, hint
+language: Python
+rule:
+  pattern: print($$$)
+  inside:
+    kind: module
+    stopBy: end
+    has:
+      any:
+        - pattern: import logging
+        - pattern: from logging import $_
+# utils: Extract repeated rule as local utility here.
+# note: Add detailed explanation for the rule.
+
