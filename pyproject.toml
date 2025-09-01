@@ -13,7 +13,7 @@ build-backend = "pdm.backend"
 
 [project]
 authors = [{ name = "Thorsten Vitt", email = "thorsten.vitt@uni-wuerzburg.de" }]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
   "blessings<2.0,>=1.7",
   "more-itertools<9.0.0,>=8.13.0",

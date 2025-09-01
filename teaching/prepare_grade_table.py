@@ -1,10 +1,11 @@
-from ast import Name
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, Type, cast
+from csv import DictReader
 
 if TYPE_CHECKING:
     from openpyxl.cell import _CellGetValue  # pyright: ignore[reportPrivateUsage]
 
+from attr import dataclass
 from openpyxl.styles.fonts import Font
 from openpyxl.styles.named_styles import NamedStyle
 from openpyxl.worksheet.worksheet import Worksheet
@@ -41,6 +42,85 @@ def parse_his_sheet(file: Path):
         return [dict(zip(headings, record)) for record in raw_records]
     except StopIteration:
         raise InvalidForm(f"{file} is not a HIS table")
+
+
+@dataclass
+class TaskAssessmentA:
+    full_name: str
+    grade: float
+    max_grade: float
+
+
+@dataclass
+class TaskAssessmentB:
+    name: str
+    given_name: str
+    id: int
+    grade: float
+
+
+def _convert[T, D](
+    value: Any,  # pyright: ignore[reportExplicitAny]
+    type_: type[T],
+    default: D | None = None,
+) -> T | D:
+    try:
+        return type_(value)  # pyright: ignore[reportCallIssue]
+    except ValueError:
+        if default is None:
+            return type_()
+        else:
+            return default
+
+
+def parse_wuecampus_sheet(file: Path):
+    """
+    Parses a WueCampus sheet in CSV form.
+
+    There are actually two kinds of sheet:
+
+    (1) a single task sheet ID with the fields
+         "Vollständiger Name", E-Mail-Adresse, Status, Bewertung, Bestwertung,
+         "Bewertung kann geändert werden", "Zuletzt geändert (Abgabe)",
+         "Zuletzt geändert (Bewertung)", "Feedback als Kommentar"
+
+    (2) the total sheet that can be exported from the _Bewertungen_ section of wuecampus.
+        This file contains fields Vorname, Nachname, Matrikelnr., Institution, Studiengang, E-Mail-Adresse,
+        then for each task a field starting with "Aufgabe: ", and then a few summary fields
+    """
+    with file.open(newline="") as csvfile:
+        records = list(DictReader(csvfile))
+
+    if "Bewertung" in records[0]:  # single task
+        if file.stem == "Bewertung":
+            task_name = file.parent.stem
+        else:
+            task_name = file.stem.split("-")[2]
+        students = [
+            TaskAssessmentA(
+                full_name=record["Vollständiger Name"],
+                grade=_convert(record["Bewertung"], float),
+                max_grade=_convert(record["Bestwertung"], float),
+            )
+            for record in records
+        ]
+        return {task_name: students}
+    else:
+        result = {}
+        for field in records[0]:
+            if field.startswith("Aufgabe: "):
+                task_name = field[8:].strip()
+                students = [
+                    TaskAssessmentB(
+                        name=record["Nachname"],
+                        given_name=record["Vorname"],
+                        id=_convert(record["Matrikelnr."], int),
+                        grade=_convert(record[field], float),
+                    )
+                    for record in records
+                ]
+                result[task_name] = students
+    return records
 
 
 def parse_his_sheets(files: list[Path]):
