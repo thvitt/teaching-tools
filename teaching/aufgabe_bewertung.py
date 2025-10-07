@@ -164,9 +164,14 @@ def unzip_file(archive_, target_):
             subzip_target = file.parent / file.stem
             subzip_target.mkdir(exist_ok=True, parents=True)
             ZipFile(file).extractall(subzip_target)
-    shutil.copy2(moodle_csv, target)
-    os.chdir(target)
-    prepare_input_file("Bewertung.md", moodle_csv)
+    if moodle_csv.exists():
+        shutil.copy2(moodle_csv, target)
+        os.chdir(target)
+        prepare_input_file("Bewertung.md", moodle_csv)
+    else:
+        print("Keine Moodle-Bewertungstabelle gefunden.")
+        os.chdir(target)
+        prepare_input_file("Bewertung.md")
 
 
 def main():
