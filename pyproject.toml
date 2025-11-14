@@ -9,6 +9,9 @@ dev = [
 [tool.pdm.build]
 includes = ["teaching"]
 
+
+[tool.ruff.lint]
+select = ["A", "C4", "EXE", "FA", "ICN", "LOG", "PYI", "SIM", "PTH", "NPY", "PD", "N", "UP", "FURB", "RUF"]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"

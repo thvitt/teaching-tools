@@ -1,26 +1,24 @@
 #!/usr/bin/python3
-from importlib.util import module_from_spec
+import shutil
 from operator import attrgetter
 from pathlib import Path
-import shutil
-from tempfile import mkstemp
 from subprocess import run
-from typing import List, Dict
-
-from blessings import Terminal
-from more_itertools import one
+from tempfile import mkstemp
+from typing import override
 from zipfile import ZipFile
 
 import shtab
+from blessings import Terminal
+from more_itertools import one
 
 try:
     from readchar import key, readkey
 except ImportError as e:
     print("Failed to import readkey module. Interactions will fail.", e)
-import os
-import sys
-import re
 import csv
+import os
+import re
+import sys
 
 GRADE_FIELD = "Bewertung"
 
@@ -36,15 +34,22 @@ NAME = re.compile(r"^## ([^_\n]+)(_.*)?")
 
 
 class Bewertung:
-    def __init__(self, name, lines=None, common_note=None):
+
+    name: str
+    lines: list[str]
+    filename: str | None
+    common_note: list[str] | None
+
+
+    def __init__(self, name: str, lines: list[str] | None =None, common_note: str | list[str] | None =None):
         self.name = name
         self.lines = [] if lines is None else lines
         self.filename = None
         if common_note and isinstance(common_note, str):
             common_note = [common_note]
-        self.common_note = common_note
+        self.common_note = common_note or None
 
-    def append(self, *args):
+    def append(self, *args: str):
         self.lines.extend(args)
 
     @property
@@ -84,9 +89,7 @@ class Bewertung:
     def copy(self):
         self.mktemp()
         run(
-            "pandoc -t html -f markdown -i '{}' | xclip -i -selection clipboard -t text/html".format(
-                self.filename
-            ),
+            f"pandoc -t html -f markdown -i '{self.filename}' | xclip -i -selection clipboard -t text/html",
             shell=True,
         )
 
@@ -104,11 +107,12 @@ class Bewertung:
             os.remove(self.filename)
             self.filename = None
 
+    @override
     def __str__(self):
         return self.name + "=" * len(self.name) + "\n\n" + "".join(self.lines) + "\n\n"
 
 
-def read(filename):
+def read(filename: str | Path) -> list[Bewertung]:
     """
     Liest eine Bewertungsdatei ein.
 
@@ -118,7 +122,7 @@ def read(filename):
     Returns:
         Liste von :class:`Bewertung`en
     """
-    bewertungen = []
+    bewertungen: list[Bewertung] = []
     text = "\n" + Path(filename).read_text()
     parts = text.split("\n## ")
     preamble = parts[0].strip()
@@ -132,8 +136,8 @@ def read(filename):
     return bewertungen
 
 
-def prepare_input_file(filename, moodle_csv=None):
-    with open(filename, "wt", encoding="utf-8") as file:
+def prepare_input_file(filename: str | Path, moodle_csv: Path | None =None):
+    with open(filename, "w", encoding="utf-8") as file:
         if moodle_csv:
             with moodle_csv.open() as f:
                 reader = sorted(
@@ -146,10 +150,10 @@ def prepare_input_file(filename, moodle_csv=None):
                         file.write(f"* {row['Status']}\n\n")
         else:
             names = {fn.split("_")[0] for fn in os.listdir()}
-            lines = sorted(["## {}\n\n".format(name) for name in names])
+            lines = sorted([f"## {name}\n\n" for name in names])
             file.writelines(lines)
 
-    print("Bewertungstemplate nach {} geschrieben.".format(filename))
+    print(f"Bewertungstemplate nach {filename} geschrieben.")
     sys.exit(0)
 
 
@@ -199,7 +203,7 @@ def main():
         display_bewertungen(bewertungen)
 
 
-def display_bewertungen(bewertungen):
+def display_bewertungen(bewertungen: list[Bewertung]):
     index = 0
     while 0 <= index < len(bewertungen):
         bewertung = bewertungen[index]
@@ -213,11 +217,9 @@ def display_bewertungen(bewertungen):
             prompt = True
             while prompt:
                 print(
-                    t.green("#{}/{}:".format(index + 1, len(bewertungen))),
-                    "{} ({})".format(bewertung.name, bewertung.grade),
-                    "↑ {t.bold}p{t.normal}revious, ↓⏎ {t.bold}n{t.normal}ext, {t.bold}c{t.normal}opy again, {t.bold}q{t.normal}uit".format(
-                        t=t
-                    ),
+                    t.green(f"#{index + 1}/{len(bewertungen)}:"),
+                    f"{bewertung.name} ({bewertung.grade})",
+                    f"↑ {t.bold}p{t.normal}revious, ↓⏎ {t.bold}n{t.normal}ext, {t.bold}c{t.normal}opy again, {t.bold}q{t.normal}uit",
                     end=" > ",
                     flush=True,
                 )
@@ -242,9 +244,9 @@ def display_bewertungen(bewertungen):
 
 
 def augment_moodle_csv(
-    bewertungen: List[Bewertung], moodle_csv: Path, output: Path = None
+    bewertungen: list[Bewertung], moodle_csv: Path, output: Path = None
 ):
-    by_name: Dict[str, Bewertung] = {bew.name: bew for bew in bewertungen}
+    by_name: dict[str, Bewertung] = {bew.name: bew for bew in bewertungen}
 
     with moodle_csv.open() as infile:
         reader = csv.DictReader(infile)
@@ -291,7 +293,7 @@ def augment_moodle_csv(
 
 
 def export_simple_csv(bewertungen, outfile):
-    with open(outfile, "wt", encoding="utf-8") as csvout:
+    with open(outfile, "w", encoding="utf-8") as csvout:
         writer = csv.writer(csvout)
         writer.writerow(["Name", "Bewertung"])
         for bewertung in bewertungen:
