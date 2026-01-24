@@ -1,3 +1,4 @@
+from pathlib import Path
 from collections.abc import Iterable
 from os import fspath
 from typing import Annotated
@@ -5,7 +6,7 @@ from typing import Annotated
 from cyclopts import App, Parameter
 from cyclopts.types import ExistingFile
 from lxml import etree
-from lxml.etree import _Element
+from lxml.etree import _Element, _ElementTree  # pyright: ignore[reportPrivateUsage]
 
 app = App()
 app.register_install_completion_command(add_to_startup=False)  # pyright: ignore[reportUnknownMemberType]
@@ -23,6 +24,34 @@ NS = XMLNamespace(
     svg="http://www.w3.org/2000/svg",
     inkscape="http://www.inkscape.org/namespaces/inkscape",
 )
+
+
+class SteppedSVG:
+    svgfile: Path
+    svg: _ElementTree
+    layers: list[_Element]
+    steps: dict[str, _Element]
+    stepnos: dict[str, int]
+
+    def __init__(self, svgfile: Path) -> None:
+        svg = etree.parse(svgfile)
+        layers = svg.xpath('*[@inkscape:groupmode="layer"]', namespaces=NS)
+        assert isinstance(layers, list)
+        steps: dict[str, _Element] = {}
+        for layer in layers:  # pyright: ignore[reportUnknownVariableType]  -- checked in the next line ...
+            if not isinstance(layer, _Element):
+                continue
+            label = str(layer.get(NS("inkscape", "label")))
+            if not label.startswith("step-"):
+                continue
+            stepid = label[5:]  # step-…
+            steps[stepid] = layer
+
+        self.svgfile = svgfile
+        self.svg = svg
+        self.layers = layers  # pyright: ignore[reportAttributeAccessIssue]
+        self.steps = steps
+        self.stepnos = {step: stepno for stepno, step in enumerate(sorted(steps))}
 
 
 @app.default()
@@ -52,21 +81,10 @@ def svgsteps(
                 with 1.
 
     """
-    svg = etree.parse(infile)
-    layers = svg.xpath('*[@inkscape:groupmode="layer"]', namespaces=NS)
-    assert isinstance(layers, Iterable)
-    steps: dict[str, _Element] = {}
-    for layer in layers:
-        if not isinstance(layer, _Element):
-            continue
-        label = str(layer.get(NS("inkscape", "label")))
-        if not label.startswith("step-"):
-            continue
-        stepid = label[5:]  # step-…
-        steps[stepid] = layer
+    svg = SteppedSVG(infile)
 
-    for stepno, step in enumerate(sorted(steps), start=1):
-        layer = steps[step]
+    for step, stepno in svg.stepnos.items():
+        layer = svg.steps[step]
         style = layer.get("style", "")
         if "display:none" in style:
             layer.set("style", style.replace("display:none", "display:inline"))
@@ -79,5 +97,5 @@ def svgsteps(
             step=step,
             stepno=stepno,
         )
-        svg.write(outfile)
+        svg.svg.write(outfile)
         layer.set("style", style)  # restore previous style
