@@ -148,4 +148,30 @@ def svgsteps(
     for step in svg.steps:
         outfile = svg.resolve_pattern(pattern, output, step)
         svg.writestep(step, outfile)
+
+
+@app.command(name=["-l", "--list"])
+def list_layers(infile: ExistingFile, /):
+    """
+    Lists layers and steps in the given file.
+    """
+    svg = SteppedSVG(infile)
+    table = Table(
+        "Name",
+        Column("StepNo", justify="right"),
+        Column("Step", style="yellow"),
+        "Visible",
+        box=None,
+    )
+    for layer in svg.layers:
+        label = layer.get(NS("inkscape", "label"), "")
+        stepid = label[5:]
+        is_step = stepid in svg.steps
+        table.add_row(
+            label,
+            str(svg.stepnos[stepid]) if is_step else "",
+            stepid if is_step else "",
+            "yes" if "display:none" not in layer.get("style", "") else "",
+            style="dim" if not is_step else None,
         )
+    get_console().print(table)
