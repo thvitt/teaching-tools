@@ -1,3 +1,5 @@
+from sqlalchemy.exc import SQLAlchemyError
+from numpy import False_
 from sqlalchemy import create_engine, MetaData, URL
 import sys
 from pathlib import Path
@@ -24,28 +26,34 @@ def main():
     else:
         engine = create_engine(arg)
     metadata = MetaData()
-    metadata.reflect(bind=engine)
+    try:
+        metadata.reflect(bind=engine)
+    except SQLAlchemyError:
+        metadata.reflect(bind=engine, resolve_fks=False)
 
     lines: list[str] = []
     relations: list[str] = []
 
     for table in metadata.tables.values():
-        lines.append(f"table({table.name})  {{")
+        try:
+            lines.append(f"table({table.name})  {{")
 
-        for col in table.columns:
-            colstr = f"col({col.name},{col.type})"
-            if col.primary_key:
-                colstr = f"PK({colstr})"
-            if not col.nullable:
-                colstr = f"NN({colstr})"
-            if col.unique:
-                colstr = f"UQ({colstr})"
-            lines.append("    {field} " + colstr)
+            for col in table.columns:
+                colstr = f"col({col.name},{col.type})"
+                if col.primary_key:
+                    colstr = f"PK({colstr})"
+                if not col.nullable:
+                    colstr = f"NN({colstr})"
+                if col.unique:
+                    colstr = f"UQ({colstr})"
+                lines.append("    {field} " + colstr)
 
-            for fk in col.foreign_keys:
-                relations.append(
-                    f"{table.name}::{col.name} --> {fk.target_fullname.replace('.', '::')}"
-                )
+                for fk in col.foreign_keys:
+                    relations.append(
+                        f"{table.name}::{col.name} --> {fk.target_fullname.replace('.', '::')}"
+                    )
+        except Exception as e:
+            print(e)
 
         lines.append("}\n")
 
