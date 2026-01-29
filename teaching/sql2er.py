@@ -1,8 +1,14 @@
+from subprocess import run
+from tempfile import TemporaryDirectory
+from questionary import form
+from typing import Annotated, Literal
 from sqlalchemy.exc import SQLAlchemyError
-from numpy import False_
 from sqlalchemy import create_engine, MetaData, URL
-import sys
 from pathlib import Path
+from cyclopts import App, Parameter
+
+app = App()
+app.register_install_completion_command(add_to_startup=False)
 
 HEADER = """
 skinparam shadowing true
@@ -19,12 +25,7 @@ left to right direction
 """
 
 
-def main():
-    arg = sys.argv[1]
-    if Path(arg).exists():
-        engine = create_engine(URL.create("sqlite", database=arg))
-    else:
-        engine = create_engine(arg)
+def db2plantuml(engine: Engine) -> str:
     metadata = MetaData()
     try:
         metadata.reflect(bind=engine)
@@ -57,13 +58,41 @@ def main():
 
         lines.append("}\n")
 
-    print("@startuml")
-    print(HEADER)
-    print("\n".join(lines))
-    print()
-    print("\n".join(relations))
-    print("@enduml")
+    return "\n".join([HEADER, *lines, "\n\n", *relations, "@enduml\n"])
 
 
-if __name__ == "__main__":
-    main()
+@app.default
+def main(
+    db_url: str,
+    /,
+    output: Annotated[Path | None, Parameter(alias="-o")] = None,
+    format: Annotated[
+        Literal["puml", "pdf", "html", "latex", "png", "svg", "txt", "utxt"] | None,
+        Parameter(alias="-t"),
+    ] = None,
+):
+    db_path = Path(db_url)
+    if db_path.exists():
+        if db_path.suffix == ".sql":
+            engine = create_engine("sqlite:///:memory:")
+            with engine.begin() as connection:
+                connection.exec_driver_sql(db_path.read_text())
+        else:
+            engine = create_engine(URL.create(db_url))
+    else:
+        engine = create_engine(db_url)
+
+    if format is None:
+        format = output.suffix[1:] if output is not None else "puml"  # ty:ignore[invalid-assignment]  # pyright: ignore[reportAssignmentType]
+    elif output is None:
+        output = db_path.with_suffix("." + format)
+
+    puml = db2plantuml(engine)
+    if format == "puml":
+        if output is None:
+            print(puml)
+        else:
+            output.write_text(puml)
+    else:
+        with TemporaryDirectory() as tmpdir:
+            tmpdir / output.with_suffix(".puml").name
