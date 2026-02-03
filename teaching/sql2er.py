@@ -1,16 +1,20 @@
-from subprocess import run
-from tempfile import TemporaryDirectory
-from questionary import form
-from typing import Annotated, Literal
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine, MetaData, URL
+from os import fspath
 from pathlib import Path
+from shutil import copy2
+from subprocess import run
+from sys import exception
+import sys
+from tempfile import TemporaryDirectory
+from typing import Annotated, Literal
+
 from cyclopts import App, Parameter
+from sqlalchemy import URL, Engine, MetaData, create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 app = App()
-app.register_install_completion_command(add_to_startup=False)
+app.register_install_completion_command(add_to_startup=False)  # pyright: ignore[reportUnknownMemberType]
 
-HEADER = """
+HEADER = """@startuml
 skinparam shadowing true
 skinparam ClassFontStyle bold
 hide circle
@@ -66,24 +70,41 @@ def main(
     db_url: str,
     /,
     output: Annotated[Path | None, Parameter(alias="-o")] = None,
-    format: Annotated[
+    *,
+    format: Annotated[  # noqa: A002
         Literal["puml", "pdf", "html", "latex", "png", "svg", "txt", "utxt"] | None,
         Parameter(alias="-t"),
     ] = None,
 ):
-    db_path = Path(db_url)
-    if db_path.exists():
-        if db_path.suffix == ".sql":
-            engine = create_engine("sqlite:///:memory:")
-            with engine.begin() as connection:
-                connection.exec_driver_sql(db_path.read_text())
+    """
+    Generate a diagram from a database schema.
+
+    The diagram will either be in PlantUML format, or we will call PlantUML to convert it to
+    the output format explicitely given or inferred from the output file name
+
+    Args:
+        db_url: Either a database URL, or a SQLite database file, or a SQLite SQL ddl / dump file.
+        output: Output file. If missing, inferred.
+        format: Format of the output file.
+    """
+    try:
+        db_path = Path(db_url)
+        if db_path.exists():
+            if db_path.suffix == ".sql":
+                engine = create_engine("sqlite:///:memory:")
+                raw_con = engine.raw_connection()
+                raw_cur = raw_con.cursor()
+                raw_cur.executescript(db_path.read_text())
+            else:
+                engine = create_engine(URL.create(drivername="sqlite", database=db_url))
         else:
-            engine = create_engine(URL.create(db_url))
-    else:
-        engine = create_engine(db_url)
+            engine = create_engine(db_url)
+    except SQLAlchemyError as e:
+        print("ERROR: Could not open database %s: %s", db_url, e)
+        sys.exit(1)
 
     if format is None:
-        format = output.suffix[1:] if output is not None else "puml"  # ty:ignore[invalid-assignment]  # pyright: ignore[reportAssignmentType]
+        format = output.suffix[1:] if output is not None else "puml"  # ty:ignore[invalid-assignment]  # pyright: ignore[reportAssignmentType]  # noqa: A001
     elif output is None:
         output = db_path.with_suffix("." + format)
 
@@ -95,4 +116,10 @@ def main(
             output.write_text(puml)
     else:
         with TemporaryDirectory() as tmpdir:
-            tmpdir / output.with_suffix(".puml").name
+            assert output is not None
+            tmp_puml = Path(tmpdir) / output.with_suffix(".puml").name
+            tmp_puml.write_text(puml)
+            run(["plantuml", f"-t{format}", "-o", tmpdir, fspath(tmp_puml)])
+            for file in Path(tmpdir).iterdir():
+                if file.is_file() and file.suffix != ".puml":
+                    copy2(file, output.parent)
