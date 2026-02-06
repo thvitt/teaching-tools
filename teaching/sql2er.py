@@ -1,14 +1,18 @@
+import sys
 from os import fspath
 from pathlib import Path
 from shutil import copy2
 from subprocess import run
-from sys import exception
-import sys
 from tempfile import TemporaryDirectory
 from typing import Annotated, Literal
 
 from cyclopts import App, Parameter
-from sqlalchemy import URL, Engine, MetaData, create_engine
+from sqlalchemy import (
+    URL,
+    Engine,
+    MetaData,
+    create_engine,
+)
 from sqlalchemy.exc import SQLAlchemyError
 
 app = App()
@@ -30,6 +34,9 @@ left to right direction
 
 
 def db2plantuml(engine: Engine) -> str:
+    """
+    Extract a PlantUML database diagram from a database.
+    """
     metadata = MetaData()
     try:
         metadata.reflect(bind=engine)
@@ -65,6 +72,63 @@ def db2plantuml(engine: Engine) -> str:
     return "\n".join([HEADER, *lines, "\n\n", *relations, "@enduml\n"])
 
 
+def db2er(engine: Engine) -> str:
+    """
+    Try to extract an ER model from a database.
+    """
+    metadata = MetaData()
+    try:
+        metadata.reflect(bind=engine)
+    except SQLAlchemyError:
+        metadata.reflect(bind=engine, resolve_fks=False)
+
+    relationships: list[str] = []
+    ignore_tables: set[str] = set()
+
+    # first, look n:m relationships
+    for table in metadata.tables.values():
+        if len(table.foreign_key_constraints) == 2:
+            fk1, fk2 = table.foreign_key_constraints
+            if set(fk1.column_keys) | set(fk2.column_keys) == set(table.columns.keys()):
+                relationships.append(
+                    f'{fk1.referred_table.name} }}o--o{{ {fk2.referred_table.name}: "{table.name}"'
+                )
+                ignore_tables.add(table.name)
+
+    lines: list[str] = []
+
+    # now, go through the remaining tables
+    for table in metadata.tables.values():
+        # skip coupling tables
+        if table.name in ignore_tables:
+            continue
+
+        # foreign key constraints originating here are converted to relationships
+        rel_columns: set[str] = set()
+        for fk in table.foreign_key_constraints:
+            source = table.name
+            target = fk.referred_table.name
+            rel_columns |= set(fk.column_keys)
+            rel_name = fk.column_keys[0]
+            opt_source = "o" if fk.elements[0].column.nullable else "|"
+            opt_target = "o" if fk.columns[0].nullable else "|"
+            relationships.append(
+                f"{source} }}{opt_target}--{opt_source}| {target}: {rel_name}"
+            )
+
+        lines.append(f"table({table.name})  {{")
+        for column in table.columns:
+            if column.name in rel_columns:
+                continue
+            colstr = column.name
+            if column.primary_key:
+                colstr = f"PK({colstr})"
+            lines.append("    {field} " + colstr)
+        lines.append("}\n")
+
+    return "\n".join([HEADER, *lines, "\n\n", *relationships, "@enduml\n"])
+
+
 @app.default
 def main(
     db_url: str,
@@ -75,6 +139,7 @@ def main(
         Literal["puml", "pdf", "html", "latex", "png", "svg", "txt", "utxt"] | None,
         Parameter(alias="-t"),
     ] = None,
+    er: Annotated[bool, Parameter(alias="-e", negative=False)] = False,
 ):
     """
     Generate a diagram from a database schema.
@@ -85,7 +150,8 @@ def main(
     Args:
         db_url: Either a database URL, or a SQLite database file, or a SQLite SQL ddl / dump file.
         output: Output file. If missing, inferred.
-        format: Format of the output file.
+        format: File format of the output.
+        er: try to reverse-engineer an ER diagram instead of the DB diagram
     """
     try:
         db_path = Path(db_url)
@@ -108,7 +174,7 @@ def main(
     elif output is None:
         output = db_path.with_suffix("." + format)
 
-    puml = db2plantuml(engine)
+    puml = db2er(engine) if er else db2plantuml(engine)
     if format == "puml":
         if output is None:
             print(puml)
