@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 from typing import Annotated, Literal
 
 from cyclopts import App, Parameter
+from cyclopts.types import StdioPath
 from sqlalchemy import (
     URL,
     Engine,
@@ -30,6 +31,18 @@ left to right direction
 !define NN(x) *x
 !define UQ(x) x <color:blue>UQ</color>
 !define col(name,type) name: <color:gray>type</color>
+"""
+
+HEADER_ER = """@startuml
+skinparam shadowing true
+skinparam ClassFontStyle bold
+skinparam linetype ortho
+hide circle
+hide empty methods
+left to right direction
+
+!define table(x) class x 
+!define PK(x) <u>x</u>
 """
 
 
@@ -126,14 +139,22 @@ def db2er(engine: Engine) -> str:
             lines.append("    {field} " + colstr)
         lines.append("}\n")
 
-    return "\n".join([HEADER, *lines, "\n\n", *relationships, "@enduml\n"])
+    return "\n".join([HEADER_ER, *lines, "\n\n", *relationships, "@enduml\n"])
+
+
+def engine_from_ddl(ddl: str) -> Engine:
+    engine = create_engine("sqlite:///:memory:")
+    raw_con = engine.raw_connection()
+    raw_cur = raw_con.cursor()
+    raw_cur.executescript(ddl)
+    return engine
 
 
 @app.default
 def main(
-    db_url: str,
+    db_url: Annotated[str, Parameter(allow_leading_hyphen=True)],
     /,
-    output: Annotated[Path | None, Parameter(alias="-o")] = None,
+    output: Annotated[StdioPath | None, Parameter(alias="-o")] = None,
     *,
     format: Annotated[  # noqa: A002
         Literal["puml", "pdf", "html", "latex", "png", "svg", "txt", "utxt"] | None,
@@ -148,19 +169,18 @@ def main(
     the output format explicitely given or inferred from the output file name
 
     Args:
-        db_url: Either a database URL, or a SQLite database file, or a SQLite SQL ddl / dump file.
-        output: Output file. If missing, inferred.
+        db_url: Either a database URL, or a SQLite database file, or a SQLite SQL ddl / dump file, or "-" to read SQL from stdin.
+        output: Output file. If missing, inferred. If "-", the output is written to stdout.
         format: File format of the output.
-        er: try to reverse-engineer an ER diagram instead of the DB diagram
+        er: try to reverse-engineer an ER diagram instead of the DB diagram.
     """
     try:
-        db_path = Path(db_url)
-        if db_path.exists():
+        db_path = StdioPath(db_url)
+        if db_path.is_stdio:
+            engine = engine_from_ddl(sys.stdin.read())
+        elif db_path.exists():
             if db_path.suffix == ".sql":
-                engine = create_engine("sqlite:///:memory:")
-                raw_con = engine.raw_connection()
-                raw_cur = raw_con.cursor()
-                raw_cur.executescript(db_path.read_text())
+                engine = engine_from_ddl(db_path.read_text())
             else:
                 engine = create_engine(URL.create(drivername="sqlite", database=db_url))
         else:
@@ -172,7 +192,12 @@ def main(
     if format is None:
         format = output.suffix[1:] if output is not None else "puml"  # ty:ignore[invalid-assignment]  # pyright: ignore[reportAssignmentType]  # noqa: A001
     elif output is None:
-        output = db_path.with_suffix("." + format)
+        if er:
+            output = StdioPath(
+                db_path.with_name(db_path.stem + "-er").with_suffix("." + format)
+            )
+        else:
+            output = StdioPath(db_path.with_suffix("." + format))
 
     puml = db2er(engine) if er else db2plantuml(engine)
     if format == "puml":
@@ -188,4 +213,7 @@ def main(
             run(["plantuml", f"-t{format}", "-o", tmpdir, fspath(tmp_puml)])
             for file in Path(tmpdir).iterdir():
                 if file.is_file() and file.suffix != ".puml":
-                    copy2(file, output.parent)
+                    if output.is_stdio:
+                        output.write_bytes(file.read_bytes())
+                    else:
+                        copy2(file, output.parent)
