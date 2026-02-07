@@ -1,20 +1,18 @@
+import logging
+import re
+import xml.etree.ElementTree as ET
 from collections import defaultdict
+from collections.abc import Callable, Iterable
 from datetime import datetime
 from inspect import signature
-from typing import Annotated, Optional, TypeVar
-from collections.abc import Callable, Iterable
-import html5lib
-import typer
-from pathlib import Path
-import xml.etree.ElementTree as ET
-from tqdm import tqdm as track
-import humanize
-import re
 from multiprocessing import Pool
+from pathlib import Path
+from typing import Annotated, ParamSpec, TypeVar
 
-
-from typer.params import Option
-import logging
+import html5lib
+import humanize
+import typer
+from tqdm import tqdm as track
 
 logger = logging.getLogger()
 
@@ -54,10 +52,11 @@ template = """
 
   td.title {
     font-weight: bold;
-    font-size: 16pt;
+    font-size: 14pt;
   }
 
-  td.size { text-align: right; }
+  td.time { white-space: nowrap; }
+  td.size { text-align: right; white-space: nowrap;}
   td.variants { color: gray; font-variant: italic; }
 
   a.anchor-link {
@@ -80,7 +79,7 @@ template = """
 
 def get_heading(path: Path):
     logger.debug("Parsing %s", path)
-    doc = html5lib.parse(path.read_bytes(), namespaceHTMLElements=False)
+    doc = html5lib.parse(path.read_bytes(), namespaceHTMLElements=False)  # pyright: ignore[reportUnknownMemberType]
     el = None
     for pattern in [".//h1", ".//h2", ".//h3", ".//p", ".//title"]:
         el = doc.find(pattern)
@@ -89,30 +88,55 @@ def get_heading(path: Path):
     return el
 
 
-def h(tag: str, *args, parent: ET.Element | None = None, **attrib):
+def h(
+    tag: str, *args: ET.Element | str, parent: ET.Element | None = None, **attrib: str
+):
     if "class_" in attrib:
         attrib["class"] = attrib["class_"]
         del attrib["class_"]
-    if parent:
-        el = ET.SubElement(parent, tag, attrib)
-    else:
-        el = ET.Element(tag, attrib)
+    el = ET.SubElement(parent, tag, attrib) if parent else ET.Element(tag, attrib)
     if len(args) == 1 and isinstance(args[0], str):
         el.text = args[0]
     elif args:
-        el.extend(args)
+        el.extend(args)  # pyright: ignore[reportArgumentType]
     return el
 
 
-T = TypeVar("T")
+def adjust_nargs[T](
+    fun: Callable[..., T], nargs: int | None = None
+) -> Callable[..., T]:
+    """
+    Adjusts the given function such that it can be called with any number of positional arguments.
+
+    If the function is given more arguments, the remaining ones are thrown
+    away. Otherwise
+    """
+    if nargs is None:
+        params = signature(fun).parameters
+        nfuncargs = len(params)
+    else:
+        nfuncargs = nargs
+
+    def inner(*args) -> T:  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
+        if len(args) <= nfuncargs:  # pyright: ignore[reportUnknownArgumentType]
+            args_ = args[:nargs]  # pyright: ignore[reportUnknownVariableType]
+        else:
+            args_ = list(args) + [None] * (len(args) - nfuncargs)  # pyright: ignore[reportUnknownVariableType, reportUnknownArgumentType]
+        return fun(*args_)
+
+    return inner  # pyright: ignore[reportUnknownVariableType]
 
 
-def scale(
+def scale[T](
     iterable: Iterable[T],
     /,
     *,
-    key=Callable[[T], int | float],
-    format: str | Callable[[float, T], str] | Callable[[float], str] | None = None,
+    key: Callable[[T], int | float] = float,
+    format: str  # noqa: A002
+    | Callable[[float, T, int | float], str]
+    | Callable[[float, T], str]
+    | Callable[[float], str]
+    | None = None,
 ):
     """
     Scale each value in the given iterable to the interval [0.0 .. 1.0].
@@ -136,10 +160,7 @@ def scale(
         as above.
     """
     items = list(iterable)
-    if key is None:
-        values = items
-    else:
-        values = [key(it) for it in items]
+    values = [key(it) for it in items]
     smallest = min(values)
     largest = max(values)
     span = largest - smallest
@@ -150,13 +171,11 @@ def scale(
         scaled = [1.0 for _ in values]
 
     if format is None:
-        formatter = lambda x, _, __: x
+        formatter = adjust_nargs(str, 3)
     elif isinstance(format, str):
-        formatter = format.format
+        formatter = adjust_nargs(format.format, 3)
     else:
-        params = signature(format).parameters
-        param_count = min(3, len(params))
-        formatter = lambda *t: format(*t[:param_count])
+        formatter = adjust_nargs(format, 3)
     return [formatter(*t) for t in zip(scaled, items, values)]
 
 
@@ -166,7 +185,7 @@ def prepare_index(
     output: Annotated[Path | None, typer.Option("-o", "--output")] = None,
     print_title: Annotated[
         bool,
-        typer.Option("-1", "--print-title", help="print only the first file’s title"),
+        typer.Option("-1", "--print-title", help="print only the first file’s title"),  # noqa: RUF001
     ] = False,
     index_title: Annotated[str | None, typer.Option("-t", "--title")] = None,
     verbose: Annotated[bool, typer.Option("-v", "--verbose", is_flag=True)] = False,
@@ -194,35 +213,40 @@ def prepare_index(
     #    titles_.append((path, get_heading(path)))
 
     # group by equal title
-    titles = defaultdict(list)
+    titles: dict[str, list[Path]] = defaultdict(list)
     title_els = {}
     for path, h1 in titles_:
-        titles[h1.text].append(path)
-        title_els[h1.text] = h1
+        if h1:
+            titles[h1.text or ""].append(path)
+            title_els[h1.text] = h1
+            logger.debug("%s += %s", h1.text, path)
+        else:
+            logger.warning("No <h1> in %s, skipping", path)
 
-    index = html5lib.parse(template, namespaceHTMLElements=False)
+    index = html5lib.parse(template, namespaceHTMLElements=False)  # pyright: ignore[reportUnknownMemberType]
     if index_title:
         title_el = index.find("title")
         if title_el is not None:
             title_el.text = index_title
     body = index.find("body")
+    assert body is not None
     table = ET.SubElement(body, "table")
 
-    def format_date(ratio, path, timestamp):
+    def format_date(ratio: float, path: Path, timestamp: float):
         mtime = datetime.fromtimestamp(timestamp)
         return path, h(
             "td",
             mtime.strftime("%Y-%m-%d %H:%M"),
             class_="time",
-            style=f"color:lab(50 {125-250*ratio:3.2f} -125);font-weight:bold",
+            style=f"color:lab(50 {125 - 250 * ratio:3.2f} -125);font-weight:bold",
         )
 
-    def format_size(ratio, path, size):
+    def format_size(ratio: float, path: Path, size: float):
         return path, h(
             "td",
             humanize.naturalsize(size),
             class_="size",
-            style=f"color:lab(50 {250*ratio-125:3.2f} 0);font-weight:bold",
+            style=f"color:lab(50 {250 * ratio - 125:3.2f} 0);font-weight:bold",
         )
 
     dates = dict(scale(files, key=lambda p: p.stat().st_mtime, format=format_date))
@@ -265,7 +289,9 @@ def prepare_index(
                     )
                 )
 
-    result = ET.tostring(index, method="html", xml_declaration=False, encoding="utf-8")
+    result = ET.tostring(
+        index, method="html", xml_declaration=False, encoding="unicode"
+    )
 
     if output:
         if isinstance(result, bytes):
