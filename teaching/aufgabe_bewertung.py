@@ -8,11 +8,11 @@ from typing import override
 from zipfile import ZipFile
 
 import shtab
-from blessings import Terminal
+from blessings import Terminal  # pyright: ignore[reportMissingTypeStubs]
 from more_itertools import one
 
 try:
-    from readchar import key, readkey
+    from readchar import key, readkey  # pyright: ignore[reportMissingTypeStubs, reportUnknownVariableType]
 except ImportError as e:
     print("Failed to import readkey module. Interactions will fail.", e)
 import csv
@@ -34,14 +34,17 @@ NAME = re.compile(r"^## ([^_\n]+)(_.*)?")
 
 
 class Bewertung:
-
     name: str
     lines: list[str]
     filename: str | None
     common_note: list[str] | None
 
-
-    def __init__(self, name: str, lines: list[str] | None =None, common_note: str | list[str] | None =None):
+    def __init__(
+        self,
+        name: str,
+        lines: list[str] | None = None,
+        common_note: str | list[str] | None = None,
+    ):
         self.name = name
         self.lines = [] if lines is None else lines
         self.filename = None
@@ -71,7 +74,7 @@ class Bewertung:
     def text(self):
         lines = self.lines
         if self.common_note:
-            lines += ["", "----", ""] + self.common_note
+            lines += ["", "----", "", *self.common_note]
         return "\n".join(lines)
 
     @property
@@ -136,7 +139,7 @@ def read(filename: str | Path) -> list[Bewertung]:
     return bewertungen
 
 
-def prepare_input_file(filename: str | Path, moodle_csv: Path | None =None):
+def prepare_input_file(filename: str | Path, moodle_csv: Path | None = None):
     with open(filename, "w", encoding="utf-8") as file:
         if moodle_csv:
             with moodle_csv.open() as f:

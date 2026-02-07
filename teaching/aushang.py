@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import io
 import shutil
 import subprocess
 import sys
-from argparse import ArgumentParser, FileType
+from argparse import ArgumentParser
 from os import fspath
 from pathlib import Path
 from string import Template
