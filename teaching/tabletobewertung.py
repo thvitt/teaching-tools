@@ -49,7 +49,7 @@ def convert(
             autocompletion=glob_completer("*.md", "*.tmpl"),
         ),
     ],
-    output: Annotated[Optional[Path], Argument(help="Output file")] = None,
+    output: Annotated[Path | None, Argument(help="Output file")] = None,
 ):
     logging.basicConfig(level=logging.INFO)
     if table.suffix == ".csv":

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 app = typer.Typer()
 
 
-def http_server(queue: Queue, start_port: int, serve_dir: Optional[str]):
+def http_server(queue: Queue, start_port: int, serve_dir: str | None):
     class LoggingRequestHandler(SimpleHTTPRequestHandler):
         next_level: int = logging.DEBUG
 
@@ -47,7 +47,7 @@ def http_server(queue: Queue, start_port: int, serve_dir: Optional[str]):
 def main(
     cmd: list[str],
     start_port: int = 8000,
-    serve_dir: Optional[Path] = None,
+    serve_dir: Path | None = None,
     verbose: bool = False,
     shell: bool = False,
 ):

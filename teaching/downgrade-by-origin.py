@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from operator import attrgetter
-from typing import List, Iterable, Set, Optional, Dict, Callable
+from typing import List, Set, Optional, Dict
+from collections.abc import Iterable, Callable
 from warnings import warn
 
 import re
@@ -22,7 +23,7 @@ _operation_labels = dict(
         upgrade=t.blue('↑'))
 
 
-def show_pkg(pkg: apt.Package, matcher: Optional[VersionMatcher] = None):
+def show_pkg(pkg: apt.Package, matcher: VersionMatcher | None = None):
     mark = operation(pkg)
     versions = pkg.installed.version
     if pkg.installed != pkg.candidate:
@@ -34,7 +35,7 @@ def operation(pkg):
     return first(attr for attr in _operation_labels if getattr(pkg, 'marked_' + attr, False))
 
 
-def to_dict(pkg: apt.Package) -> Dict[str, str]:
+def to_dict(pkg: apt.Package) -> dict[str, str]:
     return dict(
             name=pkg.name,
             operation=operation(pkg),
@@ -44,7 +45,7 @@ def to_dict(pkg: apt.Package) -> Dict[str, str]:
     )
 
 
-def mark_from_dict(descriptor: Dict[str, str], cache: apt.Cache, auto_fix: bool = True) -> apt.Package:
+def mark_from_dict(descriptor: dict[str, str], cache: apt.Cache, auto_fix: bool = True) -> apt.Package:
     pkg = cache[descriptor['name']]
     if descriptor['operation'] == 'delete':
         pkg.mark_delete(auto_fix=auto_fix)
@@ -65,7 +66,7 @@ def _v(v: apt.package.Version) -> str:
 class Plans:
     _properties = ['install', 'upgrade', 'downgrade', 'delete', 'reinstall']  # keep is boring
 
-    def __init__(self, packages: Optional[Iterable[apt.Package]] = None):
+    def __init__(self, packages: Iterable[apt.Package] | None = None):
         for prop in self._properties:
             setattr(self, prop, set())
 
@@ -115,7 +116,7 @@ class Plans:
                 result.append(t.bold(prop) + ":\t" + ", ".join(self._fmt_pkg(pkg) for pkg in self[prop]))
         return '\n'.join(result)
 
-    def to_dict(self) -> Dict[str, List[Dict[str, str]]]:
+    def to_dict(self) -> dict[str, list[dict[str, str]]]:
         """
         Creates a serializable dictionary containing this Plans object's plans.
 
@@ -134,7 +135,7 @@ class Plans:
         return result
 
     @classmethod
-    def apply_dict(cls, source: Dict[str, List[Dict[str, str]]], cache: apt.Cache):
+    def apply_dict(cls, source: dict[str, list[dict[str, str]]], cache: apt.Cache):
         """
         Applies the dict ``source`` to the given cache by trying to prepare (mark) the operations from the dict.
 
@@ -166,11 +167,11 @@ cache = apt.cache.Cache()
 
 
 def find_relevant_packages(relevant_version: Callable[[apt.Version], bool], cache: Iterable[apt.Package] = None):
-    installed: List[apt.package.Package] = [pkg for pkg in
+    installed: list[apt.package.Package] = [pkg for pkg in
                                             tqdm(cache or apt.Cache(), desc='Finding installed packages', unit=' pkg',
                                                  leave=False)
                                             if pkg.is_installed]
-    relevant: List[apt.package.Package] = [pkg for pkg in
+    relevant: list[apt.package.Package] = [pkg for pkg in
                                            tqdm(installed, desc='Filtering relevant packages', unit=' pkg', leave=False)
                                            if relevant_version(pkg.installed)]
     print(f"{len(relevant)} relevant of {len(installed)} packages.")
@@ -179,9 +180,9 @@ def find_relevant_packages(relevant_version: Callable[[apt.Version], bool], cach
 
 class VersionMatcher:
 
-    def __init__(self, *, origin: Optional[Dict[str, str]] = {}, **patterns):
-        self.origin_patterns: Dict[str, re.Pattern] = origin and {k: re.compile(v) for k, v in origin.items()}
-        self.patterns: Dict[str, re.Pattern] = patterns and {k: re.compile(v) for k, v in patterns.items()}
+    def __init__(self, *, origin: dict[str, str] | None = {}, **patterns):
+        self.origin_patterns: dict[str, re.Pattern] = origin and {k: re.compile(v) for k, v in origin.items()}
+        self.patterns: dict[str, re.Pattern] = patterns and {k: re.compile(v) for k, v in patterns.items()}
 
     def __call__(self, version: apt.Version) -> bool:
         for attr, pattern in self.patterns.items():
@@ -193,12 +194,12 @@ class VersionMatcher:
         return False
 
 
-def alternative_version(pkg: apt.Package, is_bad: VersionMatcher) -> Optional[apt.package.Version]:
+def alternative_version(pkg: apt.Package, is_bad: VersionMatcher) -> apt.package.Version | None:
     versions = sorted(pkg.versions, key=attrgetter('policy_priority'), reverse=True)
     return first((v for v in versions if not is_bad(v)), None)
 
 
-def alternative_versions(is_bad: VersionMatcher, packages: Iterable[apt.Package]) -> List[apt.package.Version]:
+def alternative_versions(is_bad: VersionMatcher, packages: Iterable[apt.Package]) -> list[apt.package.Version]:
     alt = [alternative_version(pkg, is_bad) for pkg in packages]
     return [v for v in alt if v is not None]
 

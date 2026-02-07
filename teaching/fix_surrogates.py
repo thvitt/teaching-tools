@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from pathlib import Path
-from typing import Annotated, Iterable, Optional, overload
+from typing import Annotated, Optional, overload
+from collections.abc import Iterable
 import typer
 from collections import defaultdict
 
@@ -67,7 +68,7 @@ def _recursive_list(*roots: Path | str) -> Iterable[Path]:
 
 @app.command()
 def main(
-    files: Annotated[Optional[list[str]], typer.Argument()] = None,
+    files: Annotated[list[str] | None, typer.Argument()] = None,
     encoding: str = "cp437",
     verbose: Annotated[bool, typer.Option("-v", "--verbose")] = False,
     simulate: Annotated[bool, typer.Option("-n", "--dry-run", "--simulate")] = False,

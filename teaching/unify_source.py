@@ -50,9 +50,9 @@ def load_unified_source(filename: str, copy_unparseable: bool = False) -> str:
         Renamer().visit(code)
         return astor.to_source(code)
     except:
-        logger.error("Failed to parse {}".format(filename), exc_info=True)
+        logger.error(f"Failed to parse {filename}", exc_info=True)
         if copy_unparseable:
-            with open(filename, "rt") as source:
+            with open(filename) as source:
                 return source.read()
         else:
             raise

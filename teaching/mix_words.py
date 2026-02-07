@@ -42,7 +42,8 @@ Examples:
 import sys
 from pathlib import Path
 import re
-from typing import Counter, cast
+from typing import cast
+from collections import Counter
 import random
 from operator import itemgetter
 

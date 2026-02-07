@@ -1,4 +1,5 @@
-from typing import Annotated, Any, Hashable, Optional
+from typing import Annotated, Any, Optional
+from collections.abc import Hashable
 from sys import stderr
 import typing
 from lxml import etree
@@ -37,7 +38,7 @@ def expandns(qname: str, namespaces: dict[str | None, str]) -> str:
 @contextmanager
 def load(
     input: str,
-    output: Optional[str] = None,
+    output: str | None = None,
     inplace: bool = False,
     readonly: bool = False,
 ):
@@ -110,7 +111,7 @@ def copy_attribute(
         bool, typer.Option("-m/-c", "--move/--copy", help="Remove the src attribute")
     ] = False,
     output: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "-o",
             "--output",
@@ -182,7 +183,7 @@ def add_attribute(
         typer.Option("-f", "--format", help="Format string for the target attribute"),
     ] = "{value}",
     output: Annotated[
-        Optional[str], typer.Option("-o", "--output", metavar="FILE", writable=True)
+        str | None, typer.Option("-o", "--output", metavar="FILE", writable=True)
     ] = None,
     inplace: Annotated[bool, typer.Option("-i", "--inplace")] = False,
 ):
@@ -215,7 +216,7 @@ def format_dict(d: dict) -> str:
         str(key) if key is not None else "": str(value) for key, value in d.items()
     }
 
-    keylen = max((len(key) for key in formatted))
+    keylen = max(len(key) for key in formatted)
     lines = [
         key + " " * (keylen - len(key)) + "\t" + value
         for key, value in formatted.items()

@@ -754,7 +754,7 @@ def getargparser():
 
 
 def prepare_svg(
-    codepoints: List[int | None], chars: List[str], fmt="{codepoint:02X}   {unichar}"
+    codepoints: list[int | None], chars: list[str], fmt="{codepoint:02X}   {unichar}"
 ):
     if fmt is None:
         fmt = "{codepoint}"

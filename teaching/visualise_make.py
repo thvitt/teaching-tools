@@ -3,7 +3,8 @@ import re
 from subprocess import run
 import shlex
 import logging
-from typing import Annotated, Iterable
+from typing import Annotated
+from collections.abc import Iterable
 import networkx as nx
 from rich.console import Console
 from rich.logging import RichHandler

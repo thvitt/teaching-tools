@@ -130,7 +130,7 @@ def main():
                 sleep(1)
     except subprocess.CalledProcessError as e:
         print(
-            "{} failed with error {}.".format(e.cmd, e.returncode),
+            f"{e.cmd} failed with error {e.returncode}.",
             e.stdout,
             e.stderr,
             sep="\n\n",

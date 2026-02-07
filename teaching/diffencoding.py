@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import codecs
-from typing import List, Tuple, Iterable
+from typing import List, Tuple
+from collections.abc import Iterable
 from unicodedata import name as _name
 import click
 
@@ -23,7 +24,7 @@ def get_chars(*, codepoints: Iterable = range(256), encoding: str = "unicode"):
         return codecs.decode(octet_stream, encoding=encoding, errors="replace")
 
 
-def diff_encoding(first: str, second: str) -> List[Tuple[int, str, str]]:
+def diff_encoding(first: str, second: str) -> list[tuple[int, str, str]]:
     return [
         (index, first, second)
         for (index, (first, second)) in enumerate(

@@ -568,8 +568,8 @@ def parse_wuecampus_sheet(
 def create(
     sources: list[Path],
     output: Path,
-    tasks: Optional[str] = None,
-    exams: Optional[str] = None,
+    tasks: str | None = None,
+    exams: str | None = None,
 ):
     logging.basicConfig(
         level=logging.DEBUG,

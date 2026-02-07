@@ -18,7 +18,7 @@ def template_keys(template: str) -> set[str]:
     return result
 
 
-def read_csv(csv: Path, delimiters: Optional[str] = None) -> list[dict[str, Any]]:
+def read_csv(csv: Path, delimiters: str | None = None) -> list[dict[str, Any]]:
     with csv.open(newline="") as file:
         dialect = Sniffer().sniff(file.read(1024), delimiters)
         file.seek(0)
@@ -41,7 +41,7 @@ def main(
         ),
     ],
     moodle_output: Annotated[
-        Optional[Path], typer.Argument(help="Ausgabe-Bewertungstabelle")
+        Path | None, typer.Argument(help="Ausgabe-Bewertungstabelle")
     ] = None,
     grade_key: Annotated[
         str, typer.Option("-g", "--grade-key", help="Name der Spalte mit der Bewertung")

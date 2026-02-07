@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 from os import fspath
 from pathlib import Path
-from typing import Iterable, Union
+from typing import Union
+from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -65,7 +66,7 @@ class LinearGradeConverter:
         else:
             return self.grade_steps[idx]
 
-    def __call__(self, points: Iterable[float], details=False) -> Union[float, dict]:
+    def __call__(self, points: Iterable[float], details=False) -> float | dict:
         total = sum(points)
         result = self.grade_for(total)
         aspects = {"points": points, "total": total, "grade": result}
@@ -88,7 +89,7 @@ class InfosysGradeConverter(LinearGradeConverter):
     good_tasks_for_23: int = 2
     max_tasks_used: int = 4
 
-    def __call__(self, points: Iterable[float], details=False) -> Union[dict, float]:
+    def __call__(self, points: Iterable[float], details=False) -> dict | float:
         top_points = sorted(points, reverse=True)
         used_points = top_points[: self.max_tasks_used]
         grade = super().__call__(used_points)

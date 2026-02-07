@@ -1,7 +1,8 @@
 from collections import defaultdict
 from datetime import datetime
 from inspect import signature
-from typing import Annotated, Callable, Iterable, Optional, TypeVar
+from typing import Annotated, Optional, TypeVar
+from collections.abc import Callable, Iterable
 import html5lib
 import typer
 from pathlib import Path
@@ -88,7 +89,7 @@ def get_heading(path: Path):
     return el
 
 
-def h(tag: str, *args, parent: Optional[ET.Element] = None, **attrib):
+def h(tag: str, *args, parent: ET.Element | None = None, **attrib):
     if "class_" in attrib:
         attrib["class"] = attrib["class_"]
         del attrib["class_"]
@@ -162,12 +163,12 @@ def scale(
 @app.command()
 def prepare_index(
     files: list[Path],
-    output: Annotated[Optional[Path], typer.Option("-o", "--output")] = None,
+    output: Annotated[Path | None, typer.Option("-o", "--output")] = None,
     print_title: Annotated[
         bool,
         typer.Option("-1", "--print-title", help="print only the first file’s title"),
     ] = False,
-    index_title: Annotated[Optional[str], typer.Option("-t", "--title")] = None,
+    index_title: Annotated[str | None, typer.Option("-t", "--title")] = None,
     verbose: Annotated[bool, typer.Option("-v", "--verbose", is_flag=True)] = False,
 ):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARNING)

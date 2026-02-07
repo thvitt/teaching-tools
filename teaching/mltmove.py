@@ -28,13 +28,13 @@ def move_resources(mltfile: Path, sort_by_name: bool = False, use_filename: bool
     mlt = etree.parse(str(mltfile))
 
     resource_els = mlt.xpath('//producer/property[@name="resource"]')
-    resources: Dict[Path, List[etree.ElementBase]] = defaultdict(list)
+    resources: dict[Path, list[etree.ElementBase]] = defaultdict(list)
     for el in resource_els:
         path = source.parent / el.text
         if path.exists():
             resources[path].append(el)
 
-    order: List[Path] = sorted(resources) if sort_by_name else list(resources)
+    order: list[Path] = sorted(resources) if sort_by_name else list(resources)
     for index, resource in enumerate(order, start=1):
         elements = resources[resource]
         fn_pattern = "{mlt}.{stem}{suffix}" if use_filename else "{mlt}.{index:02}{suffix}"
