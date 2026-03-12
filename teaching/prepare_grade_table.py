@@ -198,7 +198,9 @@ class GradeSheet:
         for studi in self.students.values():
             t.add_row(studi.full_name, str(studi.id or ""), studi.exam)
         get_console().print(t)
-        more = questionary.text("Mehr Studis? (ein Name pro Zeile)").ask()
+        more = questionary.text(
+            "Mehr Studis? (ein Name pro Zeile)", multiline=True
+        ).ask()
         if more:
             for studi in more.splitlines():
                 if studi in self.students:
@@ -537,7 +539,7 @@ def parse_wuecampus_sheet(
             TaskAssessment(
                 full_name=record["Vollständiger Name"],
                 grade=_convert(record["Bewertung"], float),
-                max_grade=_convert(record["Bestwertung"], float),
+                max_grade=_convert(record.get("Bestwertung", 1), float),
             )
             for record in records
         ]
@@ -571,6 +573,15 @@ def create(
     tasks: str | None = None,
     exams: str | None = None,
 ):
+    """
+    Create an XLSX table to record grades.
+
+    Args:
+        sources: Source files. Each file can either be a HIS excel sheet exported from WueStudy, or a CSV sheet with task grades.
+        output: output file with a single table
+        tasks: auto, total number, or abbreviations for tasks columns: Generate task columns in the correct order. If missing, you will be asked interactively.
+        exam: optional number or space separated abbreviations of exam questions. If missing, you will be asked interactively.
+    """
     logging.basicConfig(
         level=logging.DEBUG,
         handlers=[RichHandler(show_time=False)],
@@ -579,7 +590,7 @@ def create(
     logging.captureWarnings(True)
     gradesheet = GradeSheet(sources)
     gradesheet.merge_student_lists()
-    # gradesheet.ask_for_students()
+    gradesheet.ask_for_students()
     gradesheet.ask_for_tasks(tasks, exams)
     gradesheet.prepare_exam_sheet()
     gradesheet.workbook.save(output)
