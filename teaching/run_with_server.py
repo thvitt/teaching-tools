@@ -1,33 +1,40 @@
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from multiprocessing import Process, Queue
-from subprocess import run
+from ast import Param
+import logging
 import os
 import shlex
-import logging
-from typing import Any, Optional
+import webbrowser
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from multiprocessing import Process, Queue
 from pathlib import Path
-import typer
+from subprocess import run
+from typing import Annotated, Any, override
+
+from cyclopts import App, Parameter
+from cyclopts.types import ExistingDirectory
+from rich.logging import RichHandler
+from sqlalchemy import alias
 
 logger = logging.getLogger(__name__)
-app = typer.Typer()
+app = App()
 
 
-def http_server(queue: Queue, start_port: int, serve_dir: str | None):
+def http_server(queue: Queue, start_port: int, serve_dir: Path):
     class LoggingRequestHandler(SimpleHTTPRequestHandler):
         next_level: int = logging.DEBUG
 
-        def log_error(self, format: str, *args: Any) -> None:
+        @override
+        def log_error(self, format: str, *args: Any) -> None:  # pyright: ignore[reportExplicitAny]
             self.next_level = logging.ERROR
             return logger.error(format, *args)
 
-        def log_message(self, format: str, *args: Any) -> None:
+        @override
+        def log_message(self, format: str, *args: Any) -> None:  # pyright: ignore[reportExplicitAny]
             result = logger.log(self.next_level, format, *args)
             self.next_level = logging.DEBUG
             return result
 
     try:
-        if serve_dir:
-            os.chdir(serve_dir)
+        os.chdir(serve_dir)
         port = start_port
         while True:
             try:
@@ -37,49 +44,59 @@ def http_server(queue: Queue, start_port: int, serve_dir: str | None):
                 port += 1
         with server:
             queue.put(port)
-            logger.info("Serving from %s at http://localhost:%d/", os.getcwd(), port)
+            logger.info("Serving from %s at http://localhost:%d/", Path().cwd(), port)
             server.serve_forever()
     except OSError as e:
         logger.error("Cannot start server: %s", e)
 
 
-@app.command()
+@app.default()
 def main(
-    cmd: list[str],
-    start_port: int = 8000,
-    serve_dir: Path | None = None,
-    verbose: bool = False,
-    shell: bool = False,
+    *cmd: str,
+    start_port: Annotated[int, Parameter(alias="-p")] = 8000,
+    serve_dir: Annotated[ExistingDirectory, Parameter(alias="-d")] = Path(),  # pyright: ignore[reportCallInDefaultInitializer]
+    verbose: Annotated[bool, Parameter(alias="-v", negative=False)] = False,
+    shell: Annotated[bool, Parameter(alias="-s", negative=False)] = False,
+    browser: Annotated[bool, Parameter(alias="-b", negative=False)] = False,
 ):
     """
-    Run a command while serving a directory via HTTP.
+    Serve a directory via http while optionally running a command.
 
-    This command first starts a simple HTTP server on a free port,
-    runs the given command and finally shuts down the HTTP server.
-
-    The server will serve the directory given with --serve-dir
-    (current directory by default) and all its subdirectories.
-    It will find a free TCP port that is at least start_port to
-    run the server. If --verbose, the server will output an
-    access log and some more details.
-
-    The remaining arguments specify the command to run and its
-    arguments. The special string {port} will be replaced with
-    the port number used by the server. If --shell is given,
-    the system shell will be used to run the command, in this
-    case only one non-option argument should be given.
-
-    The exit code will be passed on from the command.
+    Args:
+        cmd: if present, run this command line while serving the directory,
+             and terminate the server when the command has finished. The
+             special argument {port} will be replaced by the actual port
+             the content is served. If missing, display a prompt and
+             terminate the server when a newline is entered.
+        start_port: the TCP port for the webserver. If this port cannot be
+                    bound, the port number will be increased until we find
+                    a port actually available.
+        serve_dir: the directory to serve.
+        verbose: output access logs and additional messages.
+        shell: expand the command line via the configured shell.
+        browser: open (and focus) a browser window
     """
-    logging.basicConfig(level=logging.INFO if verbose else logging.WARNING)
-    queue = Queue()
+    logging.basicConfig(
+        level=logging.INFO if verbose else logging.WARNING,
+        handlers=[RichHandler(show_path=False)],
+        format="%(message)s",
+    )
+    queue = Queue()  # type: Queue[int]
     proc = Process(target=http_server, args=(queue, start_port, serve_dir))
     proc.start()
     port = queue.get()
     filled_in_cmd = [arg.replace("{port}", str(port)) for arg in cmd]
-    logger.info("Running %s", shlex.join(filled_in_cmd))
+    url = f"http://localhost:{port}/"
+    if browser:
+        webbrowser.open(url)
     try:
-        completed_process = run(filled_in_cmd, shell=shell)
+        if cmd:
+            logger.info("Running %s", shlex.join(filled_in_cmd))
+            completed_process = run(filled_in_cmd, shell=shell)
+            return completed_process.returncode
+        else:
+            app.console.input(
+                f"Running server for {serve_dir} on port [bold]{port}[/bold], visit [link={url}]{url}[/link]\nPress return to stop."
+            )
     finally:
         proc.terminate()
-    return completed_process.returncode
