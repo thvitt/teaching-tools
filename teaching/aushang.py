@@ -17,6 +17,52 @@ template = Template(r"""
 \usepackage{fontspec}
 \usepackage{scrlayer-scrpage}
 \usepackage{graphicx}
+\usepackage{layout}
+
+\setdefaultlanguage[spelling=new]{german}
+
+\setmainfont{Inclusive Sans UW}
+\setsansfont{Inclusive Sans UW}
+
+\pagestyle{scrheadings}
+
+\lohead{\includegraphics[height=2.5cm]{uniwue-logo}}
+\rohead{\includegraphics[totalheight=2.5cm]{zpd-logo}}
+\cofoot{}
+
+\DeclareNewLayer[background, page, mode=picture, contents={%
+\putLR{\makebox[0pt][r]{\raisebox{0pt}{\includegraphics[width=10cm]{uniwue-siegel-brief}\hspace*{0pt}}}}}]{bglogo}
+\AddLayersToPageStyle{scrheadings}{bglogo}
+
+
+\begin{document}
+
+{\raggedleft ${date}\par}
+
+\fontsize{36pt}{48pt}\selectfont
+
+
+\centering
+\vspace{\fill}
+
+{\bfseries\fontsize{48pt}{72pt}\selectfont
+$title
+}
+
+$content
+
+\vspace*{\fill}
+
+\end{document}
+""")
+
+
+template_old = Template(r"""
+\documentclass[paper=a4,paper=landscape,headheight=2.5cm,headinclude,fontsize=12pt,DIV16]{scrartcl}
+\usepackage{polyglossia}
+\usepackage{fontspec}
+\usepackage{scrlayer-scrpage}
+\usepackage{graphicx}
 \usepackage{adjustbox}
 \usepackage{layout}
 
